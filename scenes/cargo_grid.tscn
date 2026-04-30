@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://c6r8q0m2j3r1"]
+
+[ext_resource type="Script" uid="uid://d3j2p1v8q1p8" path="res://scripts/systems/cargo_grid.gd" id="1_grid_script"]
+
+[node name="CargoGrid" type="Node2D"]
+script = ExtResource("1_grid_script")
+largura = 6
+altura = 4
+tamanho_celula = 64
+
+[node name="PlacedItems" type="Node2D" parent="."]
+unique_name_in_owner = true
+
+[node name="PreviewSprite" type="Sprite2D" parent="."]
+unique_name_in_owner = true
+z_index = 10
+centered = false
+modulate = Color(1, 1, 1, 0.54902)

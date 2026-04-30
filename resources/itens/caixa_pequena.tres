@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://dmvn7pj5fsbf1"]
+
+[ext_resource type="Script" uid="uid://c7rc5rbr3iu3m" path="res://scripts/resources/item_data.gd" id="1_hfyn3"]
+
+[resource]
+script = ExtResource("1_hfyn3")
+nome = "Caixa Pequena"
+cor = Color(1, 1, 0.21176471, 1)
+massa = 5.0
+categoria = 2
+descricao = "Caixa de suprimentos gerais"
+metadata/_custom_type_script = "uid://c7rc5rbr3iu3m"

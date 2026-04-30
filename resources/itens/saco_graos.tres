@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://b3b1prlpo6cjc"]
+
+[ext_resource type="Script" uid="uid://c7rc5rbr3iu3m" path="res://scripts/resources/item_data.gd" id="1_0dp1c"]
+
+[resource]
+script = ExtResource("1_0dp1c")
+nome = "Saco de Grãos"
+cor = Color(0.66165966, 0, 0.094077535, 1)
+massa = 20.0
+tamanho = Vector2i(2, 2)
+categoria = 0
+metadata/_custom_type_script = "uid://c7rc5rbr3iu3m"

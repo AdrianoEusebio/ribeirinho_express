@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://bncm2diy4fiyc"]
+
+[ext_resource type="Script" uid="uid://c7rc5rbr3iu3m" path="res://scripts/resources/item_data.gd" id="1_tfhjw"]
+
+[resource]
+script = ExtResource("1_tfhjw")
+nome = "Geladeira"
+cor = Color(0.28235295, 0.2, 1, 1)
+massa = 30.0
+tamanho = Vector2i(1, 3)
+categoria = 0
+metadata/_custom_type_script = "uid://c7rc5rbr3iu3m"

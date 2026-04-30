@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://bfsge5fqt078v"]
+
+[ext_resource type="Script" uid="uid://c7rc5rbr3iu3m" path="res://scripts/resources/item_data.gd" id="1_mte50"]
+
+[resource]
+script = ExtResource("1_mte50")
+nome = "Caixa Média"
+cor = Color(0.67085814, 0.26137954, 0, 1)
+massa = 10.0
+tamanho = Vector2i(2, 1)
+metadata/_custom_type_script = "uid://c7rc5rbr3iu3m"

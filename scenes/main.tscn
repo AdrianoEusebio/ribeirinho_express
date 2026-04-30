@@ -1,7 +1,49 @@
 [gd_scene format=3 uid="uid://b8sp1u3cuyhrv"]
 
 [ext_resource type="PackedScene" uid="uid://bve7u2ui2hpfg" path="res://scenes/player.tscn" id="1_o5qli"]
+[ext_resource type="PackedScene" uid="uid://dp6m0m2h4n1v" path="res://scenes/item.tscn" id="2_tbgi4"]
+[ext_resource type="Resource" uid="uid://bfsge5fqt078v" path="res://resources/itens/caixa_media.tres" id="3_tefeu"]
+[ext_resource type="Resource" uid="uid://dmvn7pj5fsbf1" path="res://resources/itens/caixa_pequena.tres" id="4_o6xl0"]
+[ext_resource type="Resource" uid="uid://bncm2diy4fiyc" path="res://resources/itens/geladeira.tres" id="5_tipki"]
+[ext_resource type="Resource" uid="uid://b3b1prlpo6cjc" path="res://resources/itens/saco_graos.tres" id="6_o6xl0"]
+[ext_resource type="Resource" uid="uid://4p6lnsaurn46" path="res://resources/itens/medicamento.tres" id="7_tipki"]
+[ext_resource type="PackedScene" path="res://scenes/cargo_grid.tscn" id="8_tipki"]
 
 [node name="Main" type="Node2D" unique_id=1395105730]
 
 [node name="Player" parent="." unique_id=526039496 instance=ExtResource("1_o5qli")]
+
+[node name="Item" parent="." unique_id=1761401518 instance=ExtResource("2_tbgi4")]
+position = Vector2(107, 250)
+dados = ExtResource("3_tefeu")
+
+[node name="Item2" parent="." unique_id=1634598211 instance=ExtResource("2_tbgi4")]
+position = Vector2(101, 369)
+dados = ExtResource("4_o6xl0")
+
+[node name="Item3" parent="." unique_id=2122482901 instance=ExtResource("2_tbgi4")]
+position = Vector2(166, 599)
+dados = ExtResource("5_tipki")
+
+[node name="Item4" parent="." unique_id=1119863645 instance=ExtResource("2_tbgi4")]
+position = Vector2(214, 466)
+dados = ExtResource("6_o6xl0")
+
+[node name="Item5" parent="." unique_id=290507525 instance=ExtResource("2_tbgi4")]
+position = Vector2(340, 129)
+dados = ExtResource("7_tipki")
+
+[node name="Item6" parent="." unique_id=1324238349 instance=ExtResource("2_tbgi4")]
+position = Vector2(97, 502)
+dados = ExtResource("4_o6xl0")
+
+[node name="Item7" parent="." unique_id=173910228 instance=ExtResource("2_tbgi4")]
+position = Vector2(227, 236)
+dados = ExtResource("3_tefeu")
+
+[node name="Item8" parent="." unique_id=1319785328 instance=ExtResource("2_tbgi4")]
+position = Vector2(116, 122)
+dados = ExtResource("3_tefeu")
+
+[node name="CargoGrid" parent="." unique_id=1589717673 instance=ExtResource("8_tipki")]
+position = Vector2(668, 164)
