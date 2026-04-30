@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="OrderData" format=3 uid="uid://order0000002"]
+
+[ext_resource type="Script" path="res://scripts/resources/order_data.gd" id="1"]
+[ext_resource type="Resource" uid="uid://b3b1prlpo6cjc" path="res://resources/itens/saco_graos.tres" id="2"]
+[ext_resource type="Resource" uid="uid://bfsge5fqt078v" path="res://resources/itens/caixa_media.tres" id="3"]
+
+[resource]
+script = ExtResource("1")
+nome = "Carga do Interior"
+itens_necessarios = [ExtResource("2"), ExtResource("3")]
+recompensa_pontos = 200

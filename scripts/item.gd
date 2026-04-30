@@ -13,6 +13,7 @@ extends Node2D
 @onready var label_nome: Label = $LabelNome # Para debug visual se não tivermos sprite
 
 func _ready() -> void:
+	add_to_group("item_chao")
 	_atualizar_visual()
 
 ## Atualiza a aparência do item baseado nos dados atribuídos.

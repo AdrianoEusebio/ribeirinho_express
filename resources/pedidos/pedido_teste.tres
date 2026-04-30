@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="OrderData" format=3 uid="uid://order0000001"]
+
+[ext_resource type="Script" path="res://scripts/resources/order_data.gd" id="1"]
+[ext_resource type="Resource" uid="uid://4p6lnsaurn46" path="res://resources/itens/medicamento.tres" id="2"]
+[ext_resource type="Resource" uid="uid://dmvn7pj5fsbf1" path="res://resources/itens/caixa_pequena.tres" id="3"]
+
+[resource]
+script = ExtResource("1")
+nome = "Pedido Urgente"
+itens_necessarios = [ExtResource("2"), ExtResource("3")]
+recompensa_pontos = 150

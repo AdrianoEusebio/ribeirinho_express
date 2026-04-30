@@ -6,7 +6,7 @@
 script = ExtResource("1_grid_script")
 largura = 6
 altura = 4
-tamanho_celula = 64
+tamanho_celula = 48
 
 [node name="PlacedItems" type="Node2D" parent="."]
 unique_name_in_owner = true

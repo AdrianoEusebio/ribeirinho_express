@@ -17,6 +17,10 @@ var hitbox_offset: Vector2
 var itens_carregados: Array[ItemData] = []
 var estado: int = Enums.EstadoJogador.VAZIO
 
+## --- Modificadores externos ---
+var _pocas_ativas: int = 0
+var modificador_velocidade: float = 1.0
+
 @onready var animated_sprite_2d: AnimatedSprite2D = $AnimatedSprite2D
 @onready var hitbox: Area2D = $Hitbox
 @onready var item_visual_container: Node2D = $ItemVisual # Mudei para Node2D para empilhar
@@ -43,7 +47,7 @@ func process_interaction() -> void:
 		if itens_carregados.size() >= LIMITE_ITENS:
 			print("Mãos cheias!")
 			return
-			
+
 		var areas = hitbox.get_overlapping_areas()
 		for area in areas:
 			var pai = area.get_parent()
@@ -131,9 +135,30 @@ func _atualizar_visual_itens() -> void:
 # ----------------------------------
 # Movimentos do Boneco + animação
 # ----------------------------------
+func entrar_poca() -> void:
+	_pocas_ativas += 1
+	modificador_velocidade = 0.35
+
+func sair_poca() -> void:
+	_pocas_ativas = max(0, _pocas_ativas - 1)
+	if _pocas_ativas == 0:
+		modificador_velocidade = 1.0
+
+func atordoar(duracao: float) -> void:
+	if estado == Enums.EstadoJogador.ATORDOADO:
+		return
+	estado = Enums.EstadoJogador.ATORDOADO
+	await get_tree().create_timer(duracao).timeout
+	estado = Enums.EstadoJogador.VAZIO
+	_atualizar_estado()
+
 func process_movement() -> void:
+	if estado == Enums.EstadoJogador.ATORDOADO:
+		velocity = Vector2.ZERO
+		return
+
 	var direction := Input.get_vector("move_left", "move_right", "move_up", "move_down")
-	
+
 	if direction != Vector2.ZERO:
 		velocity = direction * _calcular_velocidade()
 		last_direction = direction
@@ -170,7 +195,7 @@ func _calcular_velocidade() -> float:
 		return SPEED_BASE
 	
 	var vel: float = SPEED_BASE - (massa_total * FATOR_PESO)
-	return max(vel, SPEED_MINIMA)
+	return max(vel, SPEED_MINIMA) * modificador_velocidade
 
 func _calcular_massa_total() -> float:
 	var total = 0.0

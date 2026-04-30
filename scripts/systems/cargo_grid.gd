@@ -105,11 +105,24 @@ func _colocar_item_no_grid(player, grid_pos, formato, escala_final: Vector2) -> 
 	item_to_sprite[item_data] = visual
 	
 	grid.colocar_item(item_data, grid_pos, formato)
-	
+
 	player._atualizar_estado()
 	player._atualizar_visual_itens()
-	
-	print("Item colocado no barco! Ocupação: ", grid.calcular_ocupacao(), "%")
+
+	print("Item colocado no barco! Ocupação: %.1f%%" % grid.calcular_ocupacao())
+
+	for doca in get_tree().get_nodes_in_group("doca"):
+		if doca.verificar_entrega_por_grid(grid):
+			_limpar_grid()
+			break
+
+func _limpar_grid() -> void:
+	for child in container_itens.get_children():
+		child.queue_free()
+	item_to_sprite.clear()
+	grid = GridData.new(largura, altura)
+	grid.item_quebrado.connect(_on_item_quebrado)
+	grid.item_caiu.connect(_on_item_caiu)
 
 func _draw() -> void:
 	# Desenha as linhas do grid para ajudar a ver
