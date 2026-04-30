@@ -29,7 +29,11 @@ func _tentar_spawnar() -> void:
 
 	var dados = pool_itens[randi() % pool_itens.size()]
 	var novo = ITEM_SCENE.instantiate()
-	get_parent().add_child(novo)
+	var container_itens := get_tree().current_scene.get_node_or_null("Itens")
+	if container_itens:
+		container_itens.add_child(novo)
+	else:
+		get_parent().add_child(novo)
 	novo.global_position = global_position + Vector2(randf_range(-24, 24), randf_range(-24, 24))
 	novo.dados = dados
 

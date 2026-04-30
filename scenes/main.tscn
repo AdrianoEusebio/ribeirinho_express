@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://b8sp1u3cuyhrv"]
 
-[ext_resource type="Texture2D" uid="uid://bk87t70l6gs8i" path="res://assets/assets/background.png" id="0_bg"]
+[ext_resource type="Texture2D" uid="uid://wxt4kuo5wfvh" path="res://assets/assets/background.png" id="0_bg"]
 [ext_resource type="PackedScene" uid="uid://bve7u2ui2hpfg" path="res://scenes/player.tscn" id="1_o5qli"]
 [ext_resource type="PackedScene" uid="uid://dp6m0m2h4n1v" path="res://scenes/item.tscn" id="2_tbgi4"]
 [ext_resource type="Resource" uid="uid://bfsge5fqt078v" path="res://resources/itens/caixa_media.tres" id="3_tefeu"]
@@ -10,86 +10,99 @@
 [ext_resource type="Resource" uid="uid://4p6lnsaurn46" path="res://resources/itens/medicamento.tres" id="7_tipki"]
 [ext_resource type="PackedScene" uid="uid://c6r8q0m2j3r1" path="res://scenes/cargo_grid.tscn" id="8_tipki"]
 [ext_resource type="Script" uid="uid://diax4dkge0bpc" path="res://scripts/main.gd" id="9_main"]
-[ext_resource type="PackedScene" path="res://scenes/dock.tscn" id="10_dock"]
-[ext_resource type="PackedScene" path="res://scenes/hud.tscn" id="11_hud"]
+[ext_resource type="PackedScene" uid="uid://dock00000001" path="res://scenes/dock.tscn" id="10_dock"]
+[ext_resource type="PackedScene" uid="uid://hud000000001" path="res://scenes/hud.tscn" id="11_hud"]
 [ext_resource type="Resource" uid="uid://order0000001" path="res://resources/pedidos/pedido_teste.tres" id="12_order"]
 [ext_resource type="Script" uid="uid://cxee7bwapjcwp" path="res://scripts/resources/order_data.gd" id="12_yc10j"]
-[ext_resource type="Resource" path="res://resources/pedidos/pedido_graos.tres" id="13_order"]
-[ext_resource type="Resource" path="res://resources/pedidos/pedido_geladeira.tres" id="14_order"]
-[ext_resource type="PackedScene" path="res://scenes/item_spawner.tscn" id="15_spawner"]
-[ext_resource type="PackedScene" path="res://scenes/puddle.tscn" id="16_puddle"]
-[ext_resource type="PackedScene" path="res://scenes/npc_patrol.tscn" id="17_patrol"]
+[ext_resource type="Resource" uid="uid://order0000002" path="res://resources/pedidos/pedido_graos.tres" id="13_order"]
+[ext_resource type="Resource" uid="uid://order0000003" path="res://resources/pedidos/pedido_geladeira.tres" id="14_order"]
+[ext_resource type="PackedScene" uid="uid://c8nga530q7iyy" path="res://scenes/item_spawner.tscn" id="15_spawner"]
+[ext_resource type="PackedScene" uid="uid://puddle000001" path="res://scenes/puddle.tscn" id="16_puddle"]
+[ext_resource type="PackedScene" uid="uid://b333in0wwfeqq" path="res://scenes/npc_patrol.tscn" id="17_patrol"]
 [ext_resource type="Script" uid="uid://c7rc5rbr3iu3m" path="res://scripts/resources/item_data.gd" id="18_jscy8"]
-[ext_resource type="PackedScene" path="res://scenes/thief.tscn" id="18_thief"]
-[ext_resource type="PackedScene" path="res://scenes/wall.tscn" id="19_wall"]
+[ext_resource type="PackedScene" uid="uid://thief0000001" path="res://scenes/thief.tscn" id="18_thief"]
+[ext_resource type="PackedScene" uid="uid://wall0000001" path="res://scenes/wall.tscn" id="19_wall"]
+[ext_resource type="PackedScene" uid="uid://sbxpmiwbixbc" path="res://scenes/house.tscn" id="20_house"]
+[ext_resource type="PackedScene" uid="uid://prop0000001" path="res://scenes/prop.tscn" id="21_prop"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_eb6dy"]
-size = Vector2(12.75, 14.25)
+size = Vector2(8.75, 7.25)
 
 [node name="Main" type="Node2D" unique_id=1395105730]
 script = ExtResource("9_main")
 
 [node name="Background" type="Sprite2D" parent="." unique_id=100000001]
 z_index = -1
-scale = Vector2(2, 2)
+scale = Vector2(0.93772894, 0.9375)
 texture = ExtResource("0_bg")
 centered = false
 
 [node name="Player" parent="." unique_id=526039496 instance=ExtResource("1_o5qli")]
-z_index = 1
 position = Vector2(1409, 695)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Player" unique_id=6806777]
-position = Vector2(-0.375, -0.125)
+position = Vector2(-0.625, 3.375)
 shape = SubResource("RectangleShape2D_eb6dy")
 
 [node name="CargoGrid" parent="." unique_id=1589717673 instance=ExtResource("8_tipki")]
-position = Vector2(750, 1255)
+position = Vector2(750, 1230)
 
 [node name="Doca" parent="." unique_id=690372664 instance=ExtResource("10_dock")]
-position = Vector2(872, 1160)
+position = Vector2(837, 1163)
 pool_pedidos = Array[ExtResource("12_yc10j")]([ExtResource("12_order"), ExtResource("13_order"), ExtResource("14_order")])
 
 [node name="HUD" parent="." unique_id=693470817 instance=ExtResource("11_hud")]
 
-[node name="Patrulheiro" parent="." unique_id=1118137891 instance=ExtResource("17_patrol")]
+[node name="NPCs" type="Node2D" parent="." unique_id=300000001]
+
+[node name="Patrulheiro" parent="NPCs" unique_id=1118137891 instance=ExtResource("17_patrol")]
 position = Vector2(862, 640)
 distancia_patrulha = 200.0
 
-[node name="Ladrao" parent="." unique_id=76397386 instance=ExtResource("18_thief")]
+[node name="Ladrao" parent="NPCs" unique_id=76397386 instance=ExtResource("18_thief")]
 position = Vector2(1953, 696)
+
+[node name="Casa" parent="." unique_id=2101860308 instance=ExtResource("20_house")]
+position = Vector2(865, -38)
+scale = Vector2(1.8, 1.8)
+npcs_container_path = NodePath("../NPCs")
 
 [node name="Paredes" type="Node2D" parent="." unique_id=200000001]
 
 [node name="Wall" parent="Paredes" unique_id=1787226921 instance=ExtResource("19_wall")]
 position = Vector2(744, 716)
-scale = Vector2(0.6223357, 35.972237)
+scale = Vector2(0.9874793, 31.283953)
 
 [node name="Wall2" parent="Paredes" unique_id=1895380948 instance=ExtResource("19_wall")]
 position = Vector2(1122.0001, 1017)
-scale = Vector2(2.4389186, 16.235434)
+scale = Vector2(2.7108989, 17.037592)
 
 [node name="Wall3" parent="Paredes" unique_id=755155931 instance=ExtResource("19_wall")]
 position = Vector2(1696.0001, 996)
-scale = Vector2(4.1774106, 14.131759)
+scale = Vector2(4.486686, 15.524748)
 
 [node name="Wall4" parent="Paredes" unique_id=251903277 instance=ExtResource("19_wall")]
 position = Vector2(2165, 723.00006)
-scale = Vector2(-0.8736506, 36.34707)
+scale = Vector2(-1.1025298, 35.122295)
 
 [node name="Wall5" parent="Paredes" unique_id=152236699 instance=ExtResource("19_wall")]
 position = Vector2(1449, 1272)
 scale = Vector2(-14.278497, -4.036398)
 
 [node name="Wall6" parent="Paredes" unique_id=531742352 instance=ExtResource("19_wall")]
-position = Vector2(1455, 231)
+position = Vector2(946, 241.99998)
 rotation = 3.1415927
-scale = Vector2(14.52269, 3.3011754)
+scale = Vector2(4.14939, -2.4841828)
 
 [node name="Wall7" parent="Paredes" unique_id=800339159 instance=ExtResource("19_wall")]
-position = Vector2(2023, 304)
+position = Vector2(2023, 294)
 rotation = 3.1415927
 scale = Vector2(2.4078214, -5.453281)
+
+[node name="Wall8" parent="Paredes" unique_id=87149405 instance=ExtResource("19_wall")]
+position = Vector2(1971, 354)
+rotation = -3.1415925
+scale = Vector2(3.1877959, -1.7058529)
 
 [node name="Pocas" type="Node2D" parent="." unique_id=1959607810]
 
@@ -112,43 +125,56 @@ raio = 55.0
 position = Vector2(933, 429)
 
 [node name="Spawner1" parent="Spawners" unique_id=1439329413 instance=ExtResource("15_spawner")]
-position = Vector2(1059, 49)
+position = Vector2(811, -39)
 pool_itens = Array[ExtResource("18_jscy8")]([ExtResource("7_tipki"), ExtResource("4_o6xl0"), ExtResource("3_tefeu")])
 
 [node name="Spawner2" parent="Spawners" unique_id=721152870 instance=ExtResource("15_spawner")]
+position = Vector2(289, -37)
 pool_itens = Array[ExtResource("18_jscy8")]([ExtResource("6_o6xl0"), ExtResource("5_tipki")])
 intervalo = 18.0
 
 [node name="Itens" type="Node2D" parent="." unique_id=1048864801]
+position = Vector2(39, -140)
 
 [node name="Item" parent="Itens" unique_id=1761401518 instance=ExtResource("2_tbgi4")]
-position = Vector2(1284, 431)
+position = Vector2(1195, 368)
 dados = ExtResource("3_tefeu")
 
 [node name="Item2" parent="Itens" unique_id=1634598211 instance=ExtResource("2_tbgi4")]
-position = Vector2(1539, 486)
+position = Vector2(1756, 399)
 dados = ExtResource("4_o6xl0")
 
 [node name="Item3" parent="Itens" unique_id=2122482901 instance=ExtResource("2_tbgi4")]
-position = Vector2(1377, 540)
+position = Vector2(1194, 602)
 dados = ExtResource("5_tipki")
 
 [node name="Item4" parent="Itens" unique_id=1119863645 instance=ExtResource("2_tbgi4")]
-position = Vector2(1441, 488)
+position = Vector2(1643, 616)
 dados = ExtResource("6_o6xl0")
 
 [node name="Item5" parent="Itens" unique_id=290507525 instance=ExtResource("2_tbgi4")]
-position = Vector2(1588, 430)
+position = Vector2(1666, 387)
 dados = ExtResource("7_tipki")
 
 [node name="Item6" parent="Itens" unique_id=1324238349 instance=ExtResource("2_tbgi4")]
-position = Vector2(1335, 486)
+position = Vector2(1138, 415)
 dados = ExtResource("4_o6xl0")
 
 [node name="Item7" parent="Itens" unique_id=173910228 instance=ExtResource("2_tbgi4")]
-position = Vector2(1485, 433)
+position = Vector2(1580, 393)
 dados = ExtResource("3_tefeu")
 
 [node name="Item8" parent="Itens" unique_id=1319785328 instance=ExtResource("2_tbgi4")]
-position = Vector2(1385, 431)
+position = Vector2(1350, 407)
 dados = ExtResource("3_tefeu")
+
+[node name="Props" type="Node2D" parent="." unique_id=300000002]
+
+[node name="Lixo1" parent="Props" unique_id=400000001 instance=ExtResource("21_prop")]
+position = Vector2(1300, 720)
+
+[node name="Lixo2" parent="Props" unique_id=400000002 instance=ExtResource("21_prop")]
+position = Vector2(1820, 780)
+
+[node name="Lixo3" parent="Props" unique_id=400000003 instance=ExtResource("21_prop")]
+position = Vector2(1050, 890)

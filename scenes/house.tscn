@@ -1,0 +1,71 @@
+[gd_scene format=3 uid="uid://sbxpmiwbixbc"]
+
+[ext_resource type="Texture2D" uid="uid://k47queqwy1bk" path="res://assets/assets/casa.png" id="1_casa"]
+[ext_resource type="Texture2D" uid="uid://dohne8ahqwhx7" path="res://assets/assets/casa_dentro.png" id="2_dentro"]
+[ext_resource type="Script" uid="uid://bgyp3nnb6850y" path="res://scripts/house.gd" id="3_script"]
+[ext_resource type="PackedScene" uid="uid://wall0000001" path="res://scenes/wall.tscn" id="4_se78b"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_interior"]
+size = Vector2(405, 225)
+
+[node name="House" type="Node2D" unique_id=1295007121]
+script = ExtResource("3_script")
+
+[node name="Dimmer" type="ColorRect" parent="." unique_id=1006363979]
+top_level = true
+z_index = 60
+offset_right = 2560.0
+offset_bottom = 1440.0
+mouse_filter = 2
+color = Color(0, 0, 0, 0)
+
+[node name="CasaFora" type="Sprite2D" parent="." unique_id=1938401]
+z_index = 1
+texture = ExtResource("1_casa")
+centered = false
+
+[node name="CasaDentro" type="Sprite2D" parent="." unique_id=315434964]
+texture = ExtResource("2_dentro")
+centered = false
+
+[node name="AreaInterior" type="Area2D" parent="." unique_id=812176056]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AreaInterior" unique_id=1163472020]
+position = Vector2(345.5, 188.5)
+shape = SubResource("RectangleShape2D_interior")
+
+[node name="ParedesDentro" type="Node2D" parent="." unique_id=1343434408]
+
+[node name="Wall" parent="ParedesDentro" unique_id=876668883 instance=ExtResource("4_se78b")]
+position = Vector2(564, 208.99998)
+scale = Vector2(0.48180825, 6.304021)
+
+[node name="Wall2" parent="ParedesDentro" unique_id=704991538 instance=ExtResource("4_se78b")]
+position = Vector2(124, 201.00002)
+scale = Vector2(-0.48898476, 6.8342957)
+
+[node name="Wall3" parent="ParedesDentro" unique_id=752009485 instance=ExtResource("4_se78b")]
+position = Vector2(352, 83.99999)
+scale = Vector2(4.540464, 1.3320497)
+
+[node name="Wall4" parent="ParedesDentro" unique_id=1481917953 instance=ExtResource("4_se78b")]
+position = Vector2(162, 307)
+scale = Vector2(1.5015601, -0.77822995)
+
+[node name="Wall5" parent="ParedesDentro" unique_id=1932387938 instance=ExtResource("4_se78b")]
+position = Vector2(502, 305)
+scale = Vector2(1.5882353, 0.8)
+
+[node name="ParedesFora" type="Node2D" parent="." unique_id=1285507607]
+
+[node name="Wall" parent="ParedesFora" unique_id=1953872444 instance=ExtResource("4_se78b")]
+position = Vector2(485.00003, 210.00002)
+scale = Vector2(1.2831832, 6.2856417)
+
+[node name="Wall2" parent="ParedesFora" unique_id=580137881 instance=ExtResource("4_se78b")]
+position = Vector2(188, 228)
+scale = Vector2(0.9779695, 5.0357966)
+
+[node name="Wall3" parent="ParedesFora" unique_id=61441827 instance=ExtResource("4_se78b")]
+position = Vector2(344, 124.999985)
+scale = Vector2(4.09, 3.052)

@@ -9,6 +9,9 @@ const ITEM_SCENE = preload("res://scenes/item.tscn")
 # Regras de Carga
 const LIMITE_ITENS: int = 3
 const LIMITE_PONTOS: int = 30
+const INTERVALO_PISCA_ATORDOADO: float = 0.12
+const ALPHA_PISCA_ATORDOADO: float = 0.35
+const COR_SETA_DOCA: Color = Color(0.7, 0.9, 1.0, 0.55)
 
 var last_direction: Vector2 = Vector2.RIGHT
 var hitbox_offset: Vector2
@@ -20,6 +23,8 @@ var estado: int = Enums.EstadoJogador.VAZIO
 ## --- Modificadores externos ---
 var _pocas_ativas: int = 0
 var modificador_velocidade: float = 1.0
+var _tempo_pisca_atordoado: float = 0.0
+var _pisca_atordoado_apagado: bool = false
 
 @onready var animated_sprite_2d: AnimatedSprite2D = $AnimatedSprite2D
 @onready var hitbox: Area2D = $Hitbox
@@ -32,10 +37,12 @@ func _ready() -> void:
 	_atualizar_visual_itens()
 
 
-func _physics_process(_delta: float) -> void:
+func _physics_process(delta: float) -> void:
+	_processar_pisca_atordoado(delta)
 	process_movement()
 	process_interaction()
 	move_and_slide()
+	queue_redraw()
 
 
 # ----------------------------------
@@ -91,7 +98,11 @@ func _soltar_item() -> void:
 	var item_para_soltar = itens_carregados.pop_back()
 	
 	var novo_item = ITEM_SCENE.instantiate()
-	get_parent().add_child(novo_item)
+	var container_itens := get_tree().current_scene.get_node_or_null("Itens")
+	if container_itens:
+		container_itens.add_child(novo_item)
+	else:
+		get_parent().add_child(novo_item)
 	novo_item.global_position = global_position + (last_direction * 40)
 	novo_item.dados = item_para_soltar
 	
@@ -148,9 +159,50 @@ func atordoar(duracao: float) -> void:
 	if estado == Enums.EstadoJogador.ATORDOADO:
 		return
 	estado = Enums.EstadoJogador.ATORDOADO
+	_iniciar_pisca_atordoado()
 	await get_tree().create_timer(duracao).timeout
 	estado = Enums.EstadoJogador.VAZIO
 	_atualizar_estado()
+	_parar_pisca_atordoado()
+
+func _iniciar_pisca_atordoado() -> void:
+	_tempo_pisca_atordoado = 0.0
+	_pisca_atordoado_apagado = false
+	modulate = Color.WHITE
+
+func _processar_pisca_atordoado(delta: float) -> void:
+	if estado != Enums.EstadoJogador.ATORDOADO:
+		if _pisca_atordoado_apagado or modulate != Color.WHITE:
+			_parar_pisca_atordoado()
+		return
+
+	_tempo_pisca_atordoado -= delta
+	if _tempo_pisca_atordoado > 0.0:
+		return
+
+	_tempo_pisca_atordoado = INTERVALO_PISCA_ATORDOADO
+	_pisca_atordoado_apagado = not _pisca_atordoado_apagado
+	modulate = Color(1.0, 1.0, 1.0, ALPHA_PISCA_ATORDOADO if _pisca_atordoado_apagado else 1.0)
+
+func _parar_pisca_atordoado() -> void:
+	_tempo_pisca_atordoado = 0.0
+	_pisca_atordoado_apagado = false
+	modulate = Color.WHITE
+
+func mostrar_indicador_roubo() -> void:
+	var label := Label.new()
+	label.text = "ROUBADO!"
+	label.add_theme_color_override("font_color", Color(1.0, 0.15, 0.15))
+	label.add_theme_font_size_override("font_size", 16)
+	label.z_index = 150
+	label.position = Vector2(-30, -60)
+	add_child(label)
+
+	var tween := create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(label, "position:y", label.position.y - 50.0, 1.2)
+	tween.tween_property(label, "modulate:a", 0.0, 1.2)
+	tween.chain().tween_callback(label.queue_free)
 
 func process_movement() -> void:
 	if estado == Enums.EstadoJogador.ATORDOADO:
@@ -220,3 +272,38 @@ func update_hitbox_offset() -> void:
 			hitbox.position = Vector2(y, -x)
 		Vector2.DOWN:
 			hitbox.position = Vector2(-y, x)
+
+
+func _draw() -> void:
+	var doca: Dock = _get_doca_alvo()
+	if not doca or doca.contem_posicao_global(global_position):
+		return
+
+	var destino_global: Vector2 = doca.centro_global()
+	var direcao := (to_local(destino_global) - to_local(global_position)).normalized()
+	if direcao == Vector2.ZERO:
+		return
+
+	var centro := Vector2(0, -24)
+	var perpendicular := direcao.orthogonal()
+	var ponta := centro + direcao * 3.5
+	var base := centro - direcao * 2.5
+	var asa_esquerda := base + perpendicular * 1.7
+	var asa_direita := base - perpendicular * 1.7
+
+	draw_line(centro - direcao * 4.7, base, COR_SETA_DOCA, 0.8)
+	draw_colored_polygon(PackedVector2Array([ponta, asa_esquerda, asa_direita]), COR_SETA_DOCA)
+
+
+func _get_doca_alvo() -> Dock:
+	var doca_mais_proxima: Dock = null
+	var menor_distancia := INF
+	for node in get_tree().get_nodes_in_group("doca"):
+		var doca := node as Dock
+		if not doca:
+			continue
+		var distancia := global_position.distance_to(doca.centro_global())
+		if distancia < menor_distancia:
+			menor_distancia = distancia
+			doca_mais_proxima = doca
+	return doca_mais_proxima

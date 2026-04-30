@@ -6,7 +6,12 @@
 radius = 12.0
 
 [node name="Thief" type="CharacterBody2D"]
+z_index = 100
 script = ExtResource("1")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(0, -24)
+scale = Vector2(4, 4)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_thief")

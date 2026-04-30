@@ -20,6 +20,7 @@ func _ready() -> void:
 	grid = GridData.new(largura, altura)
 	grid.item_quebrado.connect(_on_item_quebrado)
 	grid.item_caiu.connect(_on_item_caiu)
+	visible = false
 	preview_sprite.visible = false
 
 func _on_item_quebrado(item_data: ItemData) -> void:
@@ -38,6 +39,12 @@ func _on_item_caiu(item_data: ItemData, nova_pos: Vector2i) -> void:
 func _process(_delta: float) -> void:
 	var player = get_tree().get_first_node_in_group("player")
 	if not player: return
+	
+	var player_na_doca := _player_esta_na_doca(player)
+	visible = player_na_doca
+	if not player_na_doca:
+		preview_sprite.visible = false
+		return
 
 	# CALCULAR DISTÂNCIA AO CENTRO DO GRID
 	var centro_grid = global_position + Vector2(largura * tamanho_celula, altura * tamanho_celula) / 2
@@ -123,6 +130,13 @@ func _limpar_grid() -> void:
 	grid = GridData.new(largura, altura)
 	grid.item_quebrado.connect(_on_item_quebrado)
 	grid.item_caiu.connect(_on_item_caiu)
+
+func _player_esta_na_doca(player: Node2D) -> bool:
+	for node in get_tree().get_nodes_in_group("doca"):
+		var doca := node as Dock
+		if doca and doca.contem_posicao_global(player.global_position):
+			return true
+	return false
 
 func _draw() -> void:
 	# Desenha as linhas do grid para ajudar a ver
