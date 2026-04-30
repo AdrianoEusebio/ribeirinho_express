@@ -1,7 +1,7 @@
-[gd_scene load_steps=40 format=3 uid="uid://bve7u2ui2hpfg"]
+[gd_scene format=3 uid="uid://bve7u2ui2hpfg"]
 
 [ext_resource type="Texture2D" uid="uid://2oxx4b066yhr" path="res://assets/images/player/Player.png" id="1_3vyb7"]
-[ext_resource type="Script" path="res://scripts/player.gd" id="1_g2els"]
+[ext_resource type="Script" uid="uid://cf4ww3pymslsb" path="res://scripts/player.gd" id="1_g2els"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_g2els"]
 atlas = ExtResource("1_3vyb7")
@@ -288,12 +288,22 @@ animations = [{
 "speed": 7.0
 }]
 
-[node name="Player" type="CharacterBody2D"]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_g2els"]
+size = Vector2(15, 15)
+
+[node name="Player" type="CharacterBody2D" unique_id=1824517028]
 position = Vector2(571, 292)
 scale = Vector2(4, 4)
 script = ExtResource("1_g2els")
 
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=613246707]
 sprite_frames = SubResource("SpriteFrames_t4otl")
 animation = &"run_up"
 frame_progress = 0.30383
+
+[node name="Hitbox" type="Area2D" parent="." unique_id=310803644]
+position = Vector2(7.5, -0.5)
+metadata/_edit_group_ = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox" unique_id=1622917500]
+shape = SubResource("RectangleShape2D_g2els")
