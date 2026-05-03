@@ -37,12 +37,13 @@ func _on_pedido_entregue(pontos: int) -> void:
 func _atualizar_hud_pedidos() -> void:
 	var texto = ""
 	for doca in get_tree().get_nodes_in_group("doca"):
-		if doca.pedido != null:
-			texto += doca.pedido.nome + ":\n"
-			for item in doca.pedido.itens_necessarios:
-				texto += "  - " + item.nome + "\n"
+		for boat in doca.boats:
+			if boat != null and boat.pedido != null:
+				texto += boat.pedido.nome + " (Barco %d):\n" % (boat.spot_index + 1)
+				for item in boat.pedido.itens_necessarios:
+					texto += "  - " + item.nome + "\n"
 	if texto.is_empty():
-		hud.atualizar_pedidos("Nenhum pedido ativo")
+		hud.atualizar_pedidos("Aguardando barcos...")
 	else:
 		hud.atualizar_pedidos(texto)
 

@@ -4,133 +4,69 @@ extends Node2D
 signal pedido_entregue(pontos: int)
 
 @export var pool_pedidos: Array[OrderData] = []
-@export var cor: Color = Color(0.2, 0.5, 0.9)
-@export var largura_dock: float = 100.0
-@export var altura_dock: float = 60.0
-@export var margem_ativacao: float = 6.0
-@export var opacidade_fundo: float = 0.28
-@export var opacidade_pulso_min: float = 0.35
-@export var opacidade_pulso_max: float = 0.8
-@export var velocidade_pulso: float = 1.6
-@export var tamanho_tracejado: float = 10.0
-@export var intervalo_tracejado: float = 6.0
+@export var boat_scene: PackedScene = preload("res://scenes/boat.tscn")
 
-var pedido: OrderData = null
-var _tempo_pulso: float = 0.0
+@export var spot_positions: Array[Vector2] = [
+	Vector2(200, 100),
+	Vector2(500, 100),
+	Vector2(800, 100)
+]
 
-@onready var label_pedido: Label = $LabelPedido
+var boats: Array[Node2D] = [null, null, null]
 
 func _ready() -> void:
 	add_to_group("doca")
-	_proximo_pedido()
+	# Pequeno atraso para começar a spawnar barcos
+	await get_tree().create_timer(1.0).timeout
+	_check_and_spawn_boats()
 
-func _process(delta: float) -> void:
-	_tempo_pulso += delta
-	queue_redraw()
+func _check_and_spawn_boats() -> void:
+	for i in range(3):
+		if boats[i] == null:
+			_spawn_boat(i)
 
-func _proximo_pedido() -> void:
-	if pool_pedidos.is_empty():
-		pedido = null
-	else:
-		var disponiveis = pool_pedidos.filter(func(p): return p != pedido)
-		if disponiveis.is_empty():
-			disponiveis = pool_pedidos
-		pedido = disponiveis[randi() % disponiveis.size()]
-	_atualizar_label()
+func _spawn_boat(index: int) -> void:
+	var new_boat = boat_scene.instantiate()
+	add_child(new_boat)
+	boats[index] = new_boat
+	
+	var p = _get_random_pedido()
+	new_boat.setup(p, index)
+	new_boat.boat_finished.connect(_on_boat_finished)
+	
+	# Faz o barco chegar na posição do spot
+	# Como o barco é filho da Doca, a posição é relativa ou global?
+	# Vamos usar global_position para garantir.
+	var target_pos = global_position + spot_positions[index]
+	new_boat.chegar(target_pos)
 
-func _atualizar_label() -> void:
-	if pedido == null:
-		label_pedido.text = "[Doca livre]"
-		return
-	var texto = pedido.nome + ":\n"
-	for item in pedido.itens_necessarios:
-		texto += "- " + item.nome + "\n"
-	label_pedido.text = texto
+func _get_random_pedido() -> OrderData:
+	if pool_pedidos.is_empty(): return null
+	return pool_pedidos[randi() % pool_pedidos.size()]
 
-func verificar_entrega_por_grid(grid_data: GridData) -> bool:
-	if pedido == null:
-		return false
-
-	var itens_no_grid: Array = []
-	for x in range(grid_data.largura):
-		for y in range(grid_data.altura):
-			var item = grid_data.celulas[x][y]
-			if item != null and not item in itens_no_grid:
-				itens_no_grid.append(item)
-
-	var itens_encontrados: Array = []
-	for item_pedido in pedido.itens_necessarios:
-		var encontrado = false
-		for item in itens_no_grid:
-			if item.nome == item_pedido.nome and not item in itens_encontrados:
-				itens_encontrados.append(item)
-				encontrado = true
-				break
-		if not encontrado:
-			return false
-
-	var pontos = pedido.recompensa_pontos
-	_mostrar_feedback(pontos)
-	pedido = null
-	_proximo_pedido()
-	pedido_entregue.emit(pontos)
-	return true
-
-func _mostrar_feedback(pontos: int) -> void:
-	var label = Label.new()
-	label.text = "+%d pts!" % pontos
-	label.position = Vector2(largura_dock / 2.0 - 30.0, -20.0)
-	add_child(label)
-
-	var tween = create_tween()
-	tween.set_parallel(true)
-	tween.tween_property(label, "position:y", label.position.y - 60.0, 1.0).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	tween.tween_property(label, "modulate:a", 0.0, 1.0).set_trans(Tween.TRANS_LINEAR)
-	tween.chain().tween_callback(label.queue_free)
+func _on_boat_finished(boat) -> void:
+	pedido_entregue.emit(boat.pedido.recompensa_pontos)
+	var index = boat.spot_index
+	boats[index] = null
+	# Espera um pouco e spawna outro
+	await get_tree().create_timer(3.0).timeout
+	_check_and_spawn_boats()
 
 func contem_posicao_global(posicao: Vector2) -> bool:
-	var rect := Rect2(global_position, Vector2(largura_dock, altura_dock)).grow(margem_ativacao)
-	return rect.has_point(posicao)
-
-func player_esta_na_area() -> bool:
-	var player = get_tree().get_first_node_in_group("player")
-	return player != null and contem_posicao_global(player.global_position)
+	# Agora a doca é uma área que engloba todos os spots
+	# Vamos definir um retângulo grande o suficiente ou checar proximidade dos barcos
+	for boat in boats:
+		if boat != null and boat.state == boat.State.DOCKED:
+			var rect = Rect2(boat.global_position - Vector2(100, 100), Vector2(300, 200))
+			if rect.has_point(posicao):
+				return true
+	return false
 
 func centro_global() -> Vector2:
-	return global_position + Vector2(largura_dock, altura_dock) * 0.5
+	# Retorna o centro do spot mais próximo do player talvez?
+	# Por enquanto retorna o centro da doca
+	return global_position + Vector2(500, 100)
 
-func _draw() -> void:
-	var rect := Rect2(0, 0, largura_dock, altura_dock)
-	var fundo := cor
-	fundo.a = opacidade_fundo
-	draw_rect(rect, fundo)
+# Removidos métodos de desenho antigos que não fazem mais sentido
+# ou podem ser adaptados para os spots.
 
-	var pulso := (sin(_tempo_pulso * TAU * velocidade_pulso) + 1.0) * 0.5
-	var alpha := lerpf(opacidade_pulso_min, opacidade_pulso_max, pulso)
-	var cor_borda := cor.lerp(Color.WHITE, 0.35)
-	cor_borda.a = alpha
-	_desenhar_borda_tracejada(rect, cor_borda, 2.0)
-
-func _desenhar_borda_tracejada(rect: Rect2, cor_linha: Color, largura: float) -> void:
-	var pontos := [
-		rect.position,
-		rect.position + Vector2(rect.size.x, 0),
-		rect.position + rect.size,
-		rect.position + Vector2(0, rect.size.y),
-	]
-
-	for index in range(pontos.size()):
-		_desenhar_linha_tracejada(pontos[index], pontos[(index + 1) % pontos.size()], cor_linha, largura)
-
-func _desenhar_linha_tracejada(inicio: Vector2, fim: Vector2, cor_linha: Color, largura: float) -> void:
-	var vetor := fim - inicio
-	var comprimento := vetor.length()
-	if comprimento <= 0.0:
-		return
-
-	var direcao := vetor / comprimento
-	var distancia := 0.0
-	while distancia < comprimento:
-		var fim_tracejo := minf(distancia + tamanho_tracejado, comprimento)
-		draw_line(inicio + direcao * distancia, inicio + direcao * fim_tracejo, cor_linha, largura)
-		distancia += tamanho_tracejado + intervalo_tracejado
