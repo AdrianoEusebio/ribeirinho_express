@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://barco0000001"]
+
+[ext_resource type="Texture2D" uid="uid://cowwbx2sde6jw" path="res://assets/assets/barco.png" id="1_barco"]
+
+[node name="Barco" type="Sprite2D" unique_id=990591223]
+texture = ExtResource("1_barco")
+region_enabled = true
+region_rect = Rect2(13.5, 6, 216, 78)

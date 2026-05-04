@@ -22,6 +22,7 @@ func _ready() -> void:
 	grid.item_caiu.connect(_on_item_caiu)
 	visible = false
 	preview_sprite.visible = false
+	_setup_background()
 
 func _on_item_quebrado(item_data: ItemData) -> void:
 	if item_to_sprite.has(item_data):
@@ -166,9 +167,41 @@ func _player_esta_na_doca(player: Node2D) -> bool:
 				return true
 	return false
 
-func _draw() -> void:
-	# Desenha as linhas do grid para ajudar a ver
-	for x in range(largura + 1):
-		draw_line(Vector2(x * tamanho_celula, 0), Vector2(x * tamanho_celula, altura * tamanho_celula), Color.WHITE, 1.0)
-	for y in range(altura + 1):
-		draw_line(Vector2(0, y * tamanho_celula), Vector2(largura * tamanho_celula, y * tamanho_celula), Color.WHITE, 1.0)
+func _setup_background() -> void:
+	var w := largura * tamanho_celula
+	var h := altura * tamanho_celula
+
+	# Captura o estado atual da tela (barco, fundo, etc.) antes de renderizar o grid
+	var bbc := BackBufferCopy.new()
+	bbc.copy_mode = BackBufferCopy.COPY_MODE_VIEWPORT
+	add_child(bbc)
+	move_child(bbc, 0)
+
+	# Fundo com blur + escurecimento via shader
+	var blur_bg := ColorRect.new()
+	blur_bg.position = Vector2.ZERO
+	blur_bg.size = Vector2(w, h)
+	var mat := ShaderMaterial.new()
+	mat.shader = load("res://assets/shaders/grid_blur.gdshader")
+	blur_bg.material = mat
+	add_child(blur_bg)
+	move_child(blur_bg, 1)
+
+	# Nó separado para as linhas do grid, renderizadas sobre o fundo
+	var grid_lines := Node2D.new()
+	add_child(grid_lines)
+	move_child(grid_lines, 2)
+	grid_lines.draw.connect(func():
+		for x in range(largura + 1):
+			grid_lines.draw_line(
+				Vector2(x * tamanho_celula, 0),
+				Vector2(x * tamanho_celula, h),
+				Color(1, 1, 1, 0.45), 1.0
+			)
+		for y in range(altura + 1):
+			grid_lines.draw_line(
+				Vector2(0, y * tamanho_celula),
+				Vector2(w, y * tamanho_celula),
+				Color(1, 1, 1, 0.45), 1.0
+			)
+	)
