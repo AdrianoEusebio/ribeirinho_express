@@ -8,12 +8,11 @@
 [ext_resource type="Resource" uid="uid://bncm2diy4fiyc" path="res://resources/itens/geladeira.tres" id="5_tipki"]
 [ext_resource type="Resource" uid="uid://b3b1prlpo6cjc" path="res://resources/itens/saco_graos.tres" id="6_o6xl0"]
 [ext_resource type="Resource" uid="uid://4p6lnsaurn46" path="res://resources/itens/medicamento.tres" id="7_tipki"]
-[ext_resource type="PackedScene" uid="uid://c6r8q0m2j3r1" path="res://scenes/cargo_grid.tscn" id="8_tipki"]
 [ext_resource type="Script" uid="uid://diax4dkge0bpc" path="res://scripts/main.gd" id="9_main"]
 [ext_resource type="PackedScene" uid="uid://dock00000001" path="res://scenes/dock.tscn" id="10_dock"]
 [ext_resource type="PackedScene" uid="uid://hud000000001" path="res://scenes/hud.tscn" id="11_hud"]
 [ext_resource type="Resource" uid="uid://order0000001" path="res://resources/pedidos/pedido_teste.tres" id="12_order"]
-[ext_resource type="Script" uid="uid://cxee7bwapjcwp" path="res://scripts/resources/order_data.gd" id="12_yc10j"]
+[ext_resource type="Script" path="res://scripts/resources/order_data.gd" id="12_yc10j"]
 [ext_resource type="Resource" uid="uid://order0000002" path="res://resources/pedidos/pedido_graos.tres" id="13_order"]
 [ext_resource type="Resource" uid="uid://order0000003" path="res://resources/pedidos/pedido_geladeira.tres" id="14_order"]
 [ext_resource type="PackedScene" uid="uid://ci8i57wrgs5aa" path="res://scenes/item_generator.tscn" id="15_gen"]
@@ -49,8 +48,9 @@ z_index = 5
 position = Vector2(750, 1230)
 
 [node name="Doca" parent="." unique_id=690372664 instance=ExtResource("10_dock")]
-position = Vector2(837, 1163)
+position = Vector2(500, 1300)
 pool_pedidos = Array[ExtResource("12_yc10j")]([ExtResource("12_order"), ExtResource("13_order"), ExtResource("14_order")])
+spot_positions = Array[Vector2]([Vector2(350, 0), Vector2(850, 0), Vector2(1530, 0)])
 
 [node name="HUD" parent="." unique_id=693470817 instance=ExtResource("11_hud")]
 
@@ -64,7 +64,7 @@ distancia_patrulha = 200.0
 position = Vector2(1019, 648)
 
 [node name="Casa" parent="." unique_id=2101860308 instance=ExtResource("20_house")]
-position = Vector2(865, -38)
+position = Vector2(900, -105)
 scale = Vector2(1.8, 1.8)
 
 [node name="Paredes" type="Node2D" parent="." unique_id=200000001]

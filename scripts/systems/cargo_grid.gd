@@ -119,10 +119,38 @@ func _colocar_item_no_grid(player, grid_pos, formato, escala_final: Vector2) -> 
 
 	print("Item colocado no barco! Ocupação: %.1f%%" % grid.calcular_ocupacao())
 
-	for doca in get_tree().get_nodes_in_group("doca"):
-		if doca.verificar_entrega_por_grid(grid):
-			_limpar_grid()
-			break
+	_on_item_colocado()
+
+func _on_item_colocado() -> void:
+	# Quando um item é colocado, avisamos o barco (pai) para checar o pedido
+	var pai = get_parent()
+	if pai and pai.has_method("verificar_pedido"):
+		pai.verificar_pedido()
+
+func verificar_entrega_por_pedido(pedido: OrderData) -> bool:
+	if pedido == null:
+		return false
+
+	var itens_no_grid: Array = []
+	for x in range(grid.largura):
+		for y in range(grid.altura):
+			var item = grid.celulas[x][y]
+			if item != null and not item in itens_no_grid:
+				itens_no_grid.append(item)
+
+	var itens_encontrados: Array = []
+	for item_pedido in pedido.itens_necessarios:
+		var encontrado = false
+		for item in itens_no_grid:
+			if item.nome == item_pedido.nome and not item in itens_encontrados:
+				itens_encontrados.append(item)
+				encontrado = true
+				break
+		if not encontrado:
+			return false
+	
+	# Se chegou aqui, todos os itens do pedido estão no grid
+	return true
 
 func _limpar_grid() -> void:
 	for child in container_itens.get_children():
@@ -134,9 +162,9 @@ func _limpar_grid() -> void:
 
 func _player_esta_na_doca(player: Node2D) -> bool:
 	for node in get_tree().get_nodes_in_group("doca"):
-		var doca := node as Dock
-		if doca and doca.contem_posicao_global(player.global_position):
-			return true
+		if node.has_method("contem_posicao_global"):
+			if node.contem_posicao_global(player.global_position):
+				return true
 	return false
 
 func _setup_background() -> void:
