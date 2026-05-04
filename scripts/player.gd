@@ -41,6 +41,7 @@ func _physics_process(delta: float) -> void:
 	process_movement()
 	process_interaction()
 	move_and_slide()
+	z_index = int(global_position.y)
 	queue_redraw()
 
 

@@ -22,6 +22,7 @@ func _ready() -> void:
 	_atualizar_animacao()
 
 func _physics_process(delta: float) -> void:
+	z_index = int(global_position.y)
 	_cooldown_colisao -= delta
 
 	velocity = Vector2(_direcao * velocidade, 0)
@@ -33,6 +34,14 @@ func _physics_process(delta: float) -> void:
 		_atualizar_animacao()
 
 	move_and_slide()
+
+	for i in range(get_slide_collision_count()):
+		if not get_slide_collision(i).get_collider().is_in_group("player"):
+			_direcao *= -1
+			_percorrido = 0.0
+			_atualizar_animacao()
+			break
+
 	_checar_colisao_player()
 
 func _configurar_animacoes() -> void:

@@ -8,11 +8,12 @@
 [ext_resource type="Resource" uid="uid://bncm2diy4fiyc" path="res://resources/itens/geladeira.tres" id="5_tipki"]
 [ext_resource type="Resource" uid="uid://b3b1prlpo6cjc" path="res://resources/itens/saco_graos.tres" id="6_o6xl0"]
 [ext_resource type="Resource" uid="uid://4p6lnsaurn46" path="res://resources/itens/medicamento.tres" id="7_tipki"]
+[ext_resource type="PackedScene" uid="uid://c6r8q0m2j3r1" path="res://scenes/cargo_grid.tscn" id="8_tipki"]
 [ext_resource type="Script" uid="uid://diax4dkge0bpc" path="res://scripts/main.gd" id="9_main"]
 [ext_resource type="PackedScene" uid="uid://dock00000001" path="res://scenes/dock.tscn" id="10_dock"]
 [ext_resource type="PackedScene" uid="uid://hud000000001" path="res://scenes/hud.tscn" id="11_hud"]
 [ext_resource type="Resource" uid="uid://order0000001" path="res://resources/pedidos/pedido_teste.tres" id="12_order"]
-[ext_resource type="Script" path="res://scripts/resources/order_data.gd" id="12_yc10j"]
+[ext_resource type="Script" uid="uid://cxee7bwapjcwp" path="res://scripts/resources/order_data.gd" id="12_yc10j"]
 [ext_resource type="Resource" uid="uid://order0000002" path="res://resources/pedidos/pedido_graos.tres" id="13_order"]
 [ext_resource type="Resource" uid="uid://order0000003" path="res://resources/pedidos/pedido_geladeira.tres" id="14_order"]
 [ext_resource type="PackedScene" uid="uid://ci8i57wrgs5aa" path="res://scenes/item_generator.tscn" id="15_gen"]
@@ -22,10 +23,22 @@
 [ext_resource type="PackedScene" uid="uid://wall0000001" path="res://scenes/wall.tscn" id="19_wall"]
 [ext_resource type="PackedScene" uid="uid://sbxpmiwbixbc" path="res://scenes/house.tscn" id="20_house"]
 [ext_resource type="PackedScene" uid="uid://prop0000001" path="res://scenes/prop.tscn" id="21_prop"]
-[ext_resource type="PackedScene" uid="uid://barco0000001" path="res://scenes/barco.tscn" id="24_y6deb"]
+[ext_resource type="Texture2D" uid="uid://b1p1nwgfw7k84" path="res://assets/assets/pneu.png" id="24_y6deb"]
+[ext_resource type="Texture2D" uid="uid://dq2vy0l1i37tj" path="res://assets/assets/Design sem nome.png" id="25_og1vs"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_eb6dy"]
 size = Vector2(8.75, 7.25)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_og1vs"]
+size = Vector2(99, 54)
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_og1vs"]
+radius = 28.0
+height = 66.0
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_2wyq8"]
+radius = 27.0
+height = 60.0
 
 [node name="Main" type="Node2D" unique_id=1395105730]
 script = ExtResource("9_main")
@@ -64,7 +77,7 @@ distancia_patrulha = 200.0
 position = Vector2(1019, 648)
 
 [node name="Casa" parent="." unique_id=2101860308 instance=ExtResource("20_house")]
-position = Vector2(900, -105)
+position = Vector2(900.00006, -31)
 scale = Vector2(1.8, 1.8)
 
 [node name="Paredes" type="Node2D" parent="." unique_id=200000001]
@@ -100,9 +113,9 @@ rotation = 3.1415927
 scale = Vector2(2.4078214, -5.453281)
 
 [node name="Wall8" parent="Paredes" unique_id=87149405 instance=ExtResource("19_wall")]
-position = Vector2(1971, 354)
+position = Vector2(2008.9999, 362)
 rotation = -3.1415925
-scale = Vector2(3.1877959, -1.7058529)
+scale = Vector2(2.2765234, 1.2640703)
 
 [node name="Pocas" type="Node2D" parent="." unique_id=1959607810]
 
@@ -152,24 +165,42 @@ dados = ExtResource("7_tipki")
 [node name="Props" type="Node2D" parent="." unique_id=300000002]
 
 [node name="Lixo1" parent="Props" unique_id=400000001 instance=ExtResource("21_prop")]
-position = Vector2(1300, 720)
+position = Vector2(1268, 707)
+
+[node name="Sprite2D2" type="Sprite2D" parent="Props/Lixo1" unique_id=68295030]
+position = Vector2(-24.957443, -17.249998)
+scale = Vector2(1.7340425, 1.7340425)
+texture = ExtResource("24_y6deb")
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="Props/Lixo1" unique_id=2034705990]
+position = Vector2(-24.5, -18)
+shape = SubResource("RectangleShape2D_og1vs")
 
 [node name="Lixo2" parent="Props" unique_id=400000002 instance=ExtResource("21_prop")]
-position = Vector2(1820, 780)
+position = Vector2(1820, 691)
+
+[node name="Sprite2D2" type="Sprite2D" parent="Props/Lixo2" unique_id=1231176202]
+position = Vector2(0, 1.9073486e-05)
+scale = Vector2(1.7272727, 1.7272726)
+texture = ExtResource("25_og1vs")
+region_enabled = true
+region_rect = Rect2(386.51837, 402.81955, 44.337463, 62.843597)
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="Props/Lixo2" unique_id=1707763254]
+position = Vector2(1, 11)
+shape = SubResource("CapsuleShape2D_og1vs")
 
 [node name="Lixo3" parent="Props" unique_id=400000003 instance=ExtResource("21_prop")]
-position = Vector2(1050, 890)
+position = Vector2(948, 890)
 
-[node name="Barco" parent="." unique_id=1882220280 instance=ExtResource("24_y6deb")]
-position = Vector2(874, 1299)
-scale = Vector2(1.6474345, 1.6474345)
+[node name="Sprite2D2" type="Sprite2D" parent="Props/Lixo3" unique_id=208186419]
+y_sort_enabled = true
+position = Vector2(-4.9999924, -17.478235)
+scale = Vector2(1.5217382, 1.5217385)
+texture = ExtResource("25_og1vs")
+region_enabled = true
+region_rect = Rect2(958.8191, 502.75702, 46.444946, 67.61841)
 
-[node name="Barco3" parent="." unique_id=990591223 instance=ExtResource("24_y6deb")]
-position = Vector2(2043, 1294)
-scale = Vector2(1.6474345, 1.6474345)
-region_rect = Rect2(13.5, 84, 216, 80.34216)
-
-[node name="Barco4" parent="." unique_id=636904119 instance=ExtResource("24_y6deb")]
-position = Vector2(1349, 1286)
-scale = Vector2(1.6474345, 1.6474345)
-region_rect = Rect2(13.5, 164.34216, 216, 90.21646)
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="Props/Lixo3" unique_id=124888269]
+position = Vector2(-4, -8)
+shape = SubResource("CapsuleShape2D_2wyq8")

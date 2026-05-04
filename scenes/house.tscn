@@ -45,7 +45,7 @@ position = Vector2(124, 201.00002)
 scale = Vector2(-0.48898476, 6.8342957)
 
 [node name="Wall3" parent="ParedesDentro" unique_id=752009485 instance=ExtResource("4_se78b")]
-position = Vector2(352, 83.99999)
+position = Vector2(352, 109)
 scale = Vector2(4.540464, 1.3320497)
 
 [node name="Wall4" parent="ParedesDentro" unique_id=1481917953 instance=ExtResource("4_se78b")]

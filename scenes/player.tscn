@@ -292,7 +292,6 @@ animations = [{
 size = Vector2(14, 14)
 
 [node name="Player" type="CharacterBody2D" unique_id=1824517028]
-z_index = 100
 position = Vector2(571, 292)
 scale = Vector2(4, 4)
 script = ExtResource("1_g2els")

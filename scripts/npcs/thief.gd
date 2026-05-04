@@ -24,15 +24,21 @@ var _timer_fuga: float = 0.0
 var _pos_inicial: Vector2
 var _cooldown_roubo: float = 0.0
 var _ultima_direcao: Vector2 = Vector2.DOWN
+var _tempo_travado: float = 0.0
+var _angulo_desvio: float = 0.0
+var _vel_antes: float = 0.0
+var _pos_antes: Vector2
 
 @onready var animated_sprite_2d: AnimatedSprite2D = $AnimatedSprite2D
 
 func _ready() -> void:
 	_pos_inicial = global_position
+	_pos_antes = global_position
 	_configurar_animacoes()
 	_atualizar_animacao()
 
 func _physics_process(delta: float) -> void:
+	z_index = int(global_position.y)
 	_cooldown_roubo -= delta
 	var player = get_tree().get_first_node_in_group("player")
 	if not player:
@@ -57,20 +63,49 @@ func _physics_process(delta: float) -> void:
 		Estado.FUGINDO:
 			_timer_fuga -= delta
 			var dir_fuga = (global_position - player.global_position).normalized()
+			if _angulo_desvio != 0.0:
+				dir_fuga = dir_fuga.rotated(_angulo_desvio)
 			velocity = dir_fuga * velocidade * 1.2
 			if _timer_fuga <= 0:
 				_estado = Estado.PATRULHA
 
+	_vel_antes = velocity.length()
+	_pos_antes = global_position
 	move_and_slide()
+	_checar_travamento(delta)
 	_tentar_roubar_por_contato(player)
 	_atualizar_animacao()
 
 func _mover_para(alvo: Vector2, vel: float) -> void:
 	var dir = alvo - global_position
 	if dir.length() > 5.0:
-		velocity = dir.normalized() * vel
+		var dir_norm = dir.normalized()
+		if _angulo_desvio != 0.0:
+			dir_norm = dir_norm.rotated(_angulo_desvio)
+		velocity = dir_norm * vel
 	else:
 		velocity = Vector2.ZERO
+		_tempo_travado = 0.0
+		_angulo_desvio = 0.0
+
+func _checar_travamento(delta: float) -> void:
+	if _vel_antes < 5.0:
+		_tempo_travado = maxf(0.0, _tempo_travado - delta * 2.0)
+		if _tempo_travado < 0.05:
+			_angulo_desvio = 0.0
+		return
+	var deslocamento = global_position.distance_to(_pos_antes)
+	if deslocamento < _vel_antes * delta * 0.2:
+		_tempo_travado += delta
+		if _tempo_travado > 0.2 and _angulo_desvio == 0.0:
+			_angulo_desvio = PI / 2.0
+		elif _tempo_travado > 1.5:
+			_angulo_desvio = -_angulo_desvio
+			_tempo_travado = 0.3
+	else:
+		_tempo_travado = maxf(0.0, _tempo_travado - delta * 2.0)
+		if _tempo_travado < 0.05:
+			_angulo_desvio = 0.0
 
 func _roubar(player) -> void:
 	if player.itens_carregados.is_empty():

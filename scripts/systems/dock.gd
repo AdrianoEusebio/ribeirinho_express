@@ -69,4 +69,3 @@ func centro_global() -> Vector2:
 
 # Removidos métodos de desenho antigos que não fazem mais sentido
 # ou podem ser adaptados para os spots.
-
