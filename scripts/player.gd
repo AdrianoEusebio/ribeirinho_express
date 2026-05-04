@@ -14,7 +14,6 @@ const ALPHA_PISCA_ATORDOADO: float = 0.35
 const COR_SETA_DOCA: Color = Color(0.7, 0.9, 1.0, 0.55)
 
 var last_direction: Vector2 = Vector2.RIGHT
-var hitbox_offset: Vector2
 
 ## --- Inventário Multi-Itens ---
 var itens_carregados: Array[ItemData] = []
@@ -28,12 +27,12 @@ var _pisca_atordoado_apagado: bool = false
 
 @onready var animated_sprite_2d: AnimatedSprite2D = $AnimatedSprite2D
 @onready var hitbox: Area2D = $Hitbox
+@onready var hitbox_shape: CollisionShape2D = $Hitbox/CollisionShape2D
 @onready var item_visual_container: Node2D = $ItemVisual # Mudei para Node2D para empilhar
 
 
 func _ready() -> void:
 	add_to_group("player") # Permite que outros sistemas achem o player
-	hitbox_offset = hitbox.position
 	_atualizar_visual_itens()
 
 
@@ -214,7 +213,6 @@ func process_movement() -> void:
 	if direction != Vector2.ZERO:
 		velocity = direction * _calcular_velocidade()
 		last_direction = direction
-		update_hitbox_offset()
 	else:
 		velocity = Vector2.ZERO
 	
@@ -254,24 +252,6 @@ func _calcular_massa_total() -> float:
 	for item in itens_carregados:
 		total += item.massa
 	return total
-
-
-# ----------------------------------
-# Hitbox
-# ----------------------------------
-func update_hitbox_offset() -> void:
-	var x := hitbox_offset.x
-	var y := hitbox_offset.y
-	
-	match last_direction:
-		Vector2.LEFT:
-			hitbox.position = Vector2(-x, y)
-		Vector2.RIGHT:
-			hitbox.position = Vector2(x, y)
-		Vector2.UP:
-			hitbox.position = Vector2(y, -x)
-		Vector2.DOWN:
-			hitbox.position = Vector2(-y, x)
 
 
 func _draw() -> void:
