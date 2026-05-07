@@ -337,10 +337,9 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_g2els"]
-size = Vector2(9, 10.25)
+size = Vector2(14, 14)
 
 [node name="Player" type="CharacterBody2D" unique_id=1824517028]
-z_index = 100
 position = Vector2(571, 292)
 scale = Vector2(4, 4)
 script = ExtResource("1_g2els")
@@ -350,12 +349,10 @@ sprite_frames = SubResource("SpriteFrames_t4otl")
 animation = &"stumble_4"
 
 [node name="Hitbox" type="Area2D" parent="." unique_id=310803644]
-position = Vector2(7.5, -0.5)
 collision_mask = 3
 metadata/_edit_group_ = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox" unique_id=1622917500]
-position = Vector2(-8, 2.375)
 shape = SubResource("RectangleShape2D_g2els")
 
 [node name="ItemVisual" type="Node2D" parent="." unique_id=1670793950]

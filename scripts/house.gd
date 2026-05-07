@@ -11,7 +11,6 @@ enum EstadoFoco { FORA, ENTRANDO, DENTRO, SAINDO }
 @export var z_casa_dentro: int = 0
 @export var z_itens_fora: int = 0
 @export var z_spawners_fora: int = 0
-@export var z_player_fora: int = 100
 @export var itens_container_path: NodePath = ^"../Itens"
 @export var spawners_container_path: NodePath = ^"../Spawners"
 @export var npcs_container_path: NodePath = ^"../NPCs"
@@ -41,6 +40,13 @@ func _ready() -> void:
 	dimmer.size = tamanho_mundo
 	dimmer.global_position = Vector2.ZERO
 	dimmer.color = Color(0.0, 0.0, 0.0, 0.0)
+
+	# Calcula o z_index da fachada baseado no Y-mundo da base da casa
+	var rect := area_interior_shape.shape as RectangleShape2D
+	if rect:
+		var scale_y := absf(area_interior_shape.global_transform.get_scale().y)
+		var base_y := area_interior_shape.global_position.y + rect.size.y * 0.5 * scale_y
+		z_casa_fora = int(base_y)
 
 	casa_fora.modulate = Color.WHITE
 	casa_dentro.modulate = Color(1.0, 1.0, 1.0, 0.0)
@@ -83,7 +89,6 @@ func _on_area_interior_body_exited(body: Node2D) -> void:
 		return
 
 	_estado_foco = EstadoFoco.SAINDO
-	body.z_index = z_player_fora
 	_set_collision_enabled(paredes_fora, true)
 	_set_collision_enabled(paredes_dentro, false)
 	_player_dentro = null
@@ -121,8 +126,6 @@ func _aplicar_estado_fora() -> void:
 	if _spawners_container:
 		_spawners_container.z_index = z_spawners_fora
 	_ocultar_nos_area_interior_imediato()
-	if _player_dentro:
-		_player_dentro.z_index = z_player_fora
 	_set_collision_enabled(paredes_fora, true)
 	_set_collision_enabled(paredes_dentro, false)
 
