@@ -3,54 +3,83 @@ extends CharacterBody2D
 const SPRITESHEET: Texture2D = preload("res://assets/images/npc/patrulheiro.png")
 const FRAME_SIZE := Vector2i(32, 32)
 const FRAME_COUNT := 6
-const RUN_RIGHT_ROW := 4
-const RUN_RIGHT_ANIMATION := "run_right"
+const IDLE_RIGHT_ROW := 1
+const RUN_RIGHT_ROW  := 4
+const IDLE_ANIMATION := "idle_right"
+const RUN_ANIMATION  := "run_right"
 
-@export var velocidade: float = 70.0
-@export var distancia_patrulha: float = 180.0
-@export var duracao_atordoamento: float = 1.5
+@export var velocidade: float = 45.0
+@export var raio_passeio: float = 250.0
 @export var raio_colisao: float = 15.0
+@export var forca_knockback: float = 180.0
 
-var _direcao: float = 1.0
-var _percorrido: float = 0.0
+var _pos_inicial: Vector2
+var _destino: Vector2
+var _timer_destino: float = 0.0
 var _cooldown_colisao: float = 0.0
+var _cooldown_reescolha: float = 0.0
+var _flip_h: bool = false
 
 @onready var animated_sprite_2d: AnimatedSprite2D = $AnimatedSprite2D
 
 func _ready() -> void:
+	_pos_inicial = global_position
+	_destino = global_position
 	_configurar_animacoes()
-	_atualizar_animacao()
+	_escolher_destino()
 
 func _physics_process(delta: float) -> void:
 	z_index = int(global_position.y)
-	_cooldown_colisao -= delta
+	_cooldown_colisao  -= delta
+	_cooldown_reescolha -= delta
+	_timer_destino -= delta
 
-	velocity = Vector2(_direcao * velocidade, 0)
-	_percorrido += velocidade * delta
-
-	if _percorrido >= distancia_patrulha:
-		_direcao *= -1
-		_percorrido = 0.0
-		_atualizar_animacao()
+	var dist := global_position.distance_to(_destino)
+	if dist < 12.0 or _timer_destino <= 0.0:
+		velocity = Vector2.ZERO
+		animated_sprite_2d.flip_h = _flip_h
+		animated_sprite_2d.play(IDLE_ANIMATION)
+		if _timer_destino <= 0.0:
+			_escolher_destino()
+	else:
+		var dir := (_destino - global_position).normalized()
+		_flip_h = dir.x < 0.0
+		velocity = dir * velocidade
+		animated_sprite_2d.flip_h = _flip_h
+		animated_sprite_2d.play(RUN_ANIMATION)
 
 	move_and_slide()
 
-	for i in range(get_slide_collision_count()):
-		if not get_slide_collision(i).get_collider().is_in_group("player"):
-			_direcao *= -1
-			_percorrido = 0.0
-			_atualizar_animacao()
-			break
+	# Re-pick destination when hitting a wall
+	if _cooldown_reescolha <= 0.0:
+		for i in range(get_slide_collision_count()):
+			if not get_slide_collision(i).get_collider().is_in_group("player"):
+				_escolher_destino()
+				_cooldown_reescolha = 1.2
+				break
 
 	_checar_colisao_player()
 
+func _escolher_destino() -> void:
+	var angulo := randf() * TAU
+	var dist := randf_range(60.0, raio_passeio)
+	_destino = _pos_inicial + Vector2(cos(angulo), sin(angulo)) * dist
+	_timer_destino = randf_range(3.0, 7.0)
+
 func _configurar_animacoes() -> void:
 	var frames := SpriteFrames.new()
-	frames.add_animation(RUN_RIGHT_ANIMATION)
-	frames.set_animation_loop(RUN_RIGHT_ANIMATION, true)
-	frames.set_animation_speed(RUN_RIGHT_ANIMATION, 7.0)
+
+	frames.add_animation(IDLE_ANIMATION)
+	frames.set_animation_loop(IDLE_ANIMATION, true)
+	frames.set_animation_speed(IDLE_ANIMATION, 5.0)
 	for frame_index in FRAME_COUNT:
-		frames.add_frame(RUN_RIGHT_ANIMATION, _criar_frame(RUN_RIGHT_ROW, frame_index))
+		frames.add_frame(IDLE_ANIMATION, _criar_frame(IDLE_RIGHT_ROW, frame_index))
+
+	frames.add_animation(RUN_ANIMATION)
+	frames.set_animation_loop(RUN_ANIMATION, true)
+	frames.set_animation_speed(RUN_ANIMATION, 6.0)
+	for frame_index in FRAME_COUNT:
+		frames.add_frame(RUN_ANIMATION, _criar_frame(RUN_RIGHT_ROW, frame_index))
 
 	if frames.has_animation("default"):
 		frames.remove_animation("default")
@@ -62,10 +91,6 @@ func _criar_frame(row: int, column: int) -> AtlasTexture:
 	frame.region = Rect2(column * FRAME_SIZE.x, row * FRAME_SIZE.y, FRAME_SIZE.x, FRAME_SIZE.y)
 	return frame
 
-func _atualizar_animacao() -> void:
-	animated_sprite_2d.flip_h = _direcao < 0.0
-	animated_sprite_2d.play(RUN_RIGHT_ANIMATION)
-
 func _checar_colisao_player() -> void:
 	if _cooldown_colisao > 0:
 		return
@@ -73,5 +98,6 @@ func _checar_colisao_player() -> void:
 	if not player:
 		return
 	if global_position.distance_to(player.global_position) <= raio_colisao * 4:
-		player.atordoar(duracao_atordoamento)
-		_cooldown_colisao = duracao_atordoamento + 0.5
+		var direcao_repulsao: Vector2 = (player.global_position - global_position).normalized()
+		player.aplicar_knockback(direcao_repulsao, forca_knockback)
+		_cooldown_colisao = 0.6

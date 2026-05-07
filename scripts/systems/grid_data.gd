@@ -8,6 +8,7 @@ signal item_caiu(item: ItemData, nova_pos: Vector2i)
 var largura: int
 var altura: int
 var celulas: Array = [] # Array 2D: celulas[x][y]
+var celulas_bloqueadas: Array[Vector2i] = []
 
 func _init(l: int, a: int) -> void:
 	largura = l
@@ -18,12 +19,16 @@ func _init(l: int, a: int) -> void:
 			coluna.append(null)
 		celulas.append(coluna)
 
+func bloquear_celulas(bloqueadas: Array[Vector2i]) -> void:
+	celulas_bloqueadas = bloqueadas
+
 func pode_colocar(item: ItemData, pos: Vector2i, formato: Array[Vector2i]) -> bool:
 	for celula_relativa in formato:
 		var x = pos.x + celula_relativa.x
 		var y = pos.y + celula_relativa.y
 		if x < 0 or x >= largura or y < 0 or y >= altura: return false
 		if celulas[x][y] != null: return false
+		if Vector2i(x, y) in celulas_bloqueadas: return false
 	
 	if item.categoria == Enums.Categoria.PESADO:
 		var toca_chao = false

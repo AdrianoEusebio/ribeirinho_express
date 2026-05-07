@@ -18,7 +18,7 @@
 [ext_resource type="Resource" uid="uid://order0000003" path="res://resources/pedidos/pedido_geladeira.tres" id="14_order"]
 [ext_resource type="PackedScene" uid="uid://ci8i57wrgs5aa" path="res://scenes/item_generator.tscn" id="15_gen"]
 [ext_resource type="PackedScene" uid="uid://puddle000001" path="res://scenes/puddle.tscn" id="16_puddle"]
-[ext_resource type="PackedScene" uid="uid://b333in0wwfeqq" path="res://scenes/npc_patrol.tscn" id="17_patrol"]
+[ext_resource type="PackedScene" uid="uid://b333in0wwfeqq" path="res://scenes/citizen.tscn" id="17_patrol"]
 [ext_resource type="PackedScene" uid="uid://thief0000001" path="res://scenes/thief.tscn" id="18_thief"]
 [ext_resource type="PackedScene" uid="uid://wall0000001" path="res://scenes/wall.tscn" id="19_wall"]
 [ext_resource type="PackedScene" uid="uid://sbxpmiwbixbc" path="res://scenes/house.tscn" id="20_house"]
@@ -29,16 +29,8 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_eb6dy"]
 size = Vector2(8.75, 7.25)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_og1vs"]
-size = Vector2(99, 54)
-
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_og1vs"]
-radius = 28.0
-height = 66.0
-
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_2wyq8"]
-radius = 27.0
-height = 60.0
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_og1vs"]
+load_path = "res://.godot/imported/Design sem nome.png-c8998ee5ad08f92c2c35d80e1d0fc760.ctex"
 
 [node name="Main" type="Node2D" unique_id=1395105730]
 script = ExtResource("9_main")
@@ -63,18 +55,30 @@ position = Vector2(750, 1230)
 [node name="Doca" parent="." unique_id=690372664 instance=ExtResource("10_dock")]
 position = Vector2(500, 1300)
 pool_pedidos = Array[ExtResource("12_yc10j")]([ExtResource("12_order"), ExtResource("13_order"), ExtResource("14_order")])
-spot_positions = Array[Vector2]([Vector2(350, 0), Vector2(850, 0), Vector2(1530, 0)])
 
 [node name="HUD" parent="." unique_id=693470817 instance=ExtResource("11_hud")]
 
 [node name="NPCs" type="Node2D" parent="." unique_id=300000001]
 
-[node name="Patrulheiro" parent="NPCs" unique_id=1118137891 instance=ExtResource("17_patrol")]
-position = Vector2(814, 991)
-distancia_patrulha = 200.0
-
 [node name="Ladrao" parent="NPCs" unique_id=76397386 instance=ExtResource("18_thief")]
 position = Vector2(1019, 648)
+
+[node name="Citizens" type="Node2D" parent="NPCs" unique_id=1279661950]
+
+[node name="Citizen" parent="NPCs/Citizens" unique_id=1118137891 instance=ExtResource("17_patrol")]
+position = Vector2(814, 991)
+
+[node name="Citizen2" parent="NPCs/Citizens" unique_id=1524665197 instance=ExtResource("17_patrol")]
+position = Vector2(1374, 679)
+
+[node name="Citizen3" parent="NPCs/Citizens" unique_id=852701212 instance=ExtResource("17_patrol")]
+position = Vector2(1367, 1006)
+
+[node name="Citizen4" parent="NPCs/Citizens" unique_id=1660598413 instance=ExtResource("17_patrol")]
+position = Vector2(1855, 606)
+
+[node name="Citizen5" parent="NPCs/Citizens" unique_id=842868696 instance=ExtResource("17_patrol")]
+position = Vector2(2015, 990)
 
 [node name="Casa" parent="." unique_id=2101860308 instance=ExtResource("20_house")]
 position = Vector2(900.00006, -31)
@@ -165,16 +169,21 @@ dados = ExtResource("7_tipki")
 [node name="Props" type="Node2D" parent="." unique_id=300000002]
 
 [node name="Lixo1" parent="Props" unique_id=400000001 instance=ExtResource("21_prop")]
-position = Vector2(1268, 707)
+position = Vector2(1170, 734)
+
+[node name="SombaDoPneu" type="Sprite2D" parent="Props/Lixo1" unique_id=500000001]
+modulate = Color(0, 0, 0, 0.4)
+position = Vector2(-24, -8)
+scale = Vector2(1.9, 1.3)
+texture = ExtResource("24_y6deb")
 
 [node name="Sprite2D2" type="Sprite2D" parent="Props/Lixo1" unique_id=68295030]
 position = Vector2(-24.957443, -17.249998)
 scale = Vector2(1.7340425, 1.7340425)
 texture = ExtResource("24_y6deb")
 
-[node name="CollisionShape2D2" type="CollisionShape2D" parent="Props/Lixo1" unique_id=2034705990]
-position = Vector2(-24.5, -18)
-shape = SubResource("RectangleShape2D_og1vs")
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Props/Lixo1" unique_id=1455898330]
+polygon = PackedVector2Array(-8, -49, -24, -42, -37, -46, -56, -46, -74, -33, -74, -10, -55, 6, -39, 6, -21, -1, -10, 9, 9, 9, 22, -6, 22, -28, 2, -49)
 
 [node name="Lixo2" parent="Props" unique_id=400000002 instance=ExtResource("21_prop")]
 position = Vector2(1820, 691)
@@ -186,9 +195,8 @@ texture = ExtResource("25_og1vs")
 region_enabled = true
 region_rect = Rect2(386.51837, 402.81955, 44.337463, 62.843597)
 
-[node name="CollisionShape2D2" type="CollisionShape2D" parent="Props/Lixo2" unique_id=1707763254]
-position = Vector2(1, 11)
-shape = SubResource("CapsuleShape2D_og1vs")
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Props/Lixo2" unique_id=447275047]
+polygon = PackedVector2Array(31, -5, 11, -8, -11, -8, -32, -4, -31, 31, -13, 42, 12, 43, 30, 33)
 
 [node name="Lixo3" parent="Props" unique_id=400000003 instance=ExtResource("21_prop")]
 position = Vector2(948, 890)
@@ -197,10 +205,10 @@ position = Vector2(948, 890)
 y_sort_enabled = true
 position = Vector2(-4.9999924, -17.478235)
 scale = Vector2(1.5217382, 1.5217385)
-texture = ExtResource("25_og1vs")
+texture = SubResource("CompressedTexture2D_og1vs")
 region_enabled = true
-region_rect = Rect2(958.8191, 502.75702, 46.444946, 67.61841)
+region_rect = Rect2(722.4976, 493.84134, 67.49182, 75.81656)
 
-[node name="CollisionShape2D2" type="CollisionShape2D" parent="Props/Lixo3" unique_id=124888269]
-position = Vector2(-4, -8)
-shape = SubResource("CapsuleShape2D_2wyq8")
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Props/Lixo3" unique_id=1114835753]
+position = Vector2(46, -13)
+polygon = PackedVector2Array(-4, 25, -49, 48, -98, 26, -98, -11, -50, -13, -3, -11)
