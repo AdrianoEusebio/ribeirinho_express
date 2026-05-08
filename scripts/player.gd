@@ -25,6 +25,16 @@ var modificador_velocidade: float = 1.0
 var _tempo_pisca_atordoado: float = 0.0
 var _pisca_atordoado_apagado: bool = false
 
+## --- Knockback (NPC colisão) ---
+var _knockback_velocity: Vector2 = Vector2.ZERO
+var _knockback_timer: float = 0.0
+
+## --- Queda nas poças ---
+const CHANCE_QUEDA: float = 0.75
+const INTERVALO_QUEDA: float = 0.5
+const MAX_ITENS_CHAO: int = 30
+var _tempo_queda: float = INTERVALO_QUEDA
+
 @onready var animated_sprite_2d: AnimatedSprite2D = $AnimatedSprite2D
 @onready var hitbox: Area2D = $Hitbox
 @onready var hitbox_shape: CollisionShape2D = $Hitbox/CollisionShape2D
@@ -38,6 +48,8 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	_processar_pisca_atordoado(delta)
+	_knockback_timer = maxf(0.0, _knockback_timer - delta)
+	_processar_queda_poca(delta)
 	process_movement()
 	process_interaction()
 	move_and_slide()
@@ -155,6 +167,50 @@ func sair_poca() -> void:
 	if _pocas_ativas == 0:
 		modificador_velocidade = 1.0
 
+func _processar_queda_poca(delta: float) -> void:
+	if _pocas_ativas > 0 and velocity.length() > 0 and itens_carregados.size() > 0 \
+			and estado != Enums.EstadoJogador.ATORDOADO:
+		_tempo_queda -= delta
+		if _tempo_queda <= 0.0:
+			_tempo_queda = INTERVALO_QUEDA
+			if randf() < CHANCE_QUEDA:
+				_escorregar()
+	else:
+		_tempo_queda = INTERVALO_QUEDA
+
+func _escorregar() -> void:
+	estado = Enums.EstadoJogador.ATORDOADO
+	_iniciar_pisca_atordoado()
+
+	var container_itens := get_tree().current_scene.get_node_or_null("Itens")
+	var itens_no_chao := get_tree().get_nodes_in_group("item_chao").size()
+
+	for item_data in itens_carregados:
+		if itens_no_chao >= MAX_ITENS_CHAO:
+			break
+		var novo_item := ITEM_SCENE.instantiate()
+		if container_itens:
+			container_itens.add_child(novo_item)
+		else:
+			get_parent().add_child(novo_item)
+		novo_item.global_position = global_position
+		novo_item.dados = item_data
+
+		var angulo := randf() * TAU
+		var dist   := randf_range(40.0, 90.0)
+		var destino := global_position + Vector2(cos(angulo), sin(angulo)) * dist
+		var tween := novo_item.create_tween()
+		tween.tween_property(novo_item, "global_position", destino, 0.35) \
+			.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		itens_no_chao += 1
+
+	itens_carregados.clear()
+	_atualizar_visual_itens()
+
+	await get_tree().create_timer(1.0).timeout
+	_parar_pisca_atordoado()
+	_atualizar_estado()
+
 func atordoar(duracao: float) -> void:
 	if estado == Enums.EstadoJogador.ATORDOADO:
 		return
@@ -204,9 +260,18 @@ func mostrar_indicador_roubo() -> void:
 	tween.tween_property(label, "modulate:a", 0.0, 1.2)
 	tween.chain().tween_callback(label.queue_free)
 
+func aplicar_knockback(direcao: Vector2, forca: float = 420.0) -> void:
+	_knockback_velocity = direcao.normalized() * forca
+	_knockback_timer = 0.22
+
 func process_movement() -> void:
 	if estado == Enums.EstadoJogador.ATORDOADO:
 		velocity = Vector2.ZERO
+		return
+
+	if _knockback_timer > 0.0:
+		velocity = _knockback_velocity
+		process_animation(_knockback_velocity)
 		return
 
 	var direction := Input.get_vector("move_left", "move_right", "move_up", "move_down")
@@ -256,6 +321,7 @@ func _calcular_massa_total() -> float:
 
 
 func _draw() -> void:
+	_desenhar_barra_carga()
 	var doca: Dock = _get_doca_alvo()
 	if not doca or doca.contem_posicao_global(global_position):
 		return
@@ -275,6 +341,25 @@ func _draw() -> void:
 	draw_line(centro - direcao * 4.7, base, COR_SETA_DOCA, 0.8)
 	draw_colored_polygon(PackedVector2Array([ponta, asa_esquerda, asa_direita]), COR_SETA_DOCA)
 
+
+func _desenhar_barra_carga() -> void:
+	if itens_carregados.is_empty():
+		return
+	var pontos_atuais := 0
+	for item in itens_carregados:
+		pontos_atuais += _get_pontos_item(item)
+	var pct   := float(pontos_atuais) / LIMITE_PONTOS
+	var bar_w := 32.0
+	var bar_h := 4.0
+	var bar_x := -bar_w / 2.0
+	var bar_y := -50.0
+	draw_rect(Rect2(bar_x, bar_y, bar_w, bar_h), Color(0.12, 0.12, 0.12, 0.85))
+	var cor: Color
+	if   pct > 0.8: cor = Color(1.0,  0.2,  0.2)
+	elif pct > 0.5: cor = Color(1.0,  0.65, 0.1)
+	else:           cor = Color(0.2,  0.7,  1.0)
+	draw_rect(Rect2(bar_x, bar_y, bar_w * pct, bar_h), cor)
+	draw_rect(Rect2(bar_x, bar_y, bar_w, bar_h), Color(0.65, 0.65, 0.65, 0.6), false, 1.0)
 
 func _get_doca_alvo() -> Dock:
 	var doca_mais_proxima: Dock = null

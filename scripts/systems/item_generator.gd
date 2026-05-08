@@ -52,7 +52,7 @@ func _ready() -> void:
 	_slot_nodes.fill(null)
 
 	_timer.wait_time = INTERVALO
-	_timer.one_shot  = false
+	_timer.one_shot  = true
 	_timer.timeout.connect(_ao_tempo)
 	_timer.start()
 
@@ -119,24 +119,38 @@ func _primeiro_slot_livre() -> int:
 
 # ── Geração ────────────────────────────────────────────────────────────────────
 
+func _escolher_item() -> ItemData:
+	var contagem: Dictionary = {}
+	for node in _slot_nodes:
+		if node != null and is_instance_valid(node) and node.dados != null:
+			var n: String = node.dados.nome
+			contagem[n] = contagem.get(n, 0) + 1
+
+	var candidatos: Array = []
+	for item in TODOS_ITENS:
+		if contagem.get(item.nome, 0) < 2:
+			candidatos.append(item)
+
+	if candidatos.is_empty():
+		candidatos = TODOS_ITENS
+
+	return candidatos[randi() % candidatos.size()].duplicate()
+
+
 func _ao_tempo() -> void:
-	if _em_transito:
-		return
 	var slot := _primeiro_slot_livre()
 	if slot == -1:
-		_timer.stop()
 		return
 	_iniciar_transito(slot)
 
 
 func _iniciar_transito(slot_idx: int) -> void:
-	_transito_dados   = TODOS_ITENS[randi() % TODOS_ITENS.size()].duplicate()
+	_transito_dados   = _escolher_item()
 	_transito_slot    = slot_idx
 	_transito_destino = _slots_pos[slot_idx]
 	_transito_pos     = _gen_centro
 	_transito_t       = 0.0
 	_em_transito      = true
-	_timer.stop()
 	queue_redraw()
 
 

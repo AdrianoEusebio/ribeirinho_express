@@ -147,6 +147,22 @@ region = Rect2(128, 160, 32, 32)
 atlas = ExtResource("1_3vyb7")
 region = Rect2(160, 160, 32, 32)
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_t4otl"]
+atlas = ExtResource("1_3vyb7")
+region = Rect2(0, 288, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_j2b1d"]
+atlas = ExtResource("1_3vyb7")
+region = Rect2(32, 288, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_cs1tg"]
+atlas = ExtResource("1_3vyb7")
+region = Rect2(64, 288, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2dvfe"]
+atlas = ExtResource("1_3vyb7")
+region = Rect2(96, 288, 32, 32)
+
 [sub_resource type="SpriteFrames" id="SpriteFrames_t4otl"]
 animations = [{
 "frames": [{
@@ -286,6 +302,38 @@ animations = [{
 "loop": true,
 "name": &"run_up",
 "speed": 7.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_t4otl")
+}],
+"loop": true,
+"name": &"stumble_1",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_j2b1d")
+}],
+"loop": true,
+"name": &"stumble_2",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_cs1tg")
+}],
+"loop": true,
+"name": &"stumble_3",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2dvfe")
+}],
+"loop": true,
+"name": &"stumble_4",
+"speed": 5.0
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_g2els"]
@@ -298,8 +346,7 @@ script = ExtResource("1_g2els")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=613246707]
 sprite_frames = SubResource("SpriteFrames_t4otl")
-animation = &"run_up"
-frame_progress = 0.30383
+animation = &"stumble_4"
 
 [node name="Hitbox" type="Area2D" parent="." unique_id=310803644]
 collision_mask = 3

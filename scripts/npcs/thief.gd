@@ -32,6 +32,7 @@ var _pos_antes: Vector2
 @onready var animated_sprite_2d: AnimatedSprite2D = $AnimatedSprite2D
 
 func _ready() -> void:
+	add_to_group("thief")
 	_pos_inicial = global_position
 	_pos_antes = global_position
 	_configurar_animacoes()
@@ -49,13 +50,12 @@ func _physics_process(delta: float) -> void:
 	match _estado:
 		Estado.PATRULHA:
 			_mover_para(_pos_inicial, velocidade * 0.4)
-			if dist <= raio_deteccao and player.itens_carregados.size() > 0:
+			if dist <= raio_deteccao and player.itens_carregados.size() > 0 and not _player_na_doca(player):
 				_estado = Estado.PERSEGUINDO
 
 		Estado.PERSEGUINDO:
-			if player.itens_carregados.is_empty():
-				_estado = Estado.PATRULHA
-			elif dist > raio_deteccao * 1.4:
+			var player_seguro: bool = player.itens_carregados.is_empty() or _player_na_doca(player)
+			if player_seguro or dist > raio_deteccao * 1.4:
 				_estado = Estado.PATRULHA
 			else:
 				_mover_para(player.global_position, velocidade)
@@ -118,10 +118,18 @@ func _roubar(player) -> void:
 	_timer_fuga = duracao_fuga
 	_cooldown_roubo = duracao_fuga + 1.0
 
+func _player_na_doca(player) -> bool:
+	for doca in get_tree().get_nodes_in_group("doca"):
+		for boat in doca.boats:
+			if boat != null and boat.state == Boat.State.DOCKED:
+				if player.global_position.distance_to(boat.global_position) <= 250.0:
+					return true
+	return false
+
 func _tentar_roubar_por_contato(player) -> void:
 	if _estado != Estado.PERSEGUINDO or _cooldown_roubo > 0:
 		return
-	if player.itens_carregados.is_empty():
+	if player.itens_carregados.is_empty() or _player_na_doca(player):
 		return
 	if _encostou_no_player(player):
 		_roubar(player)
