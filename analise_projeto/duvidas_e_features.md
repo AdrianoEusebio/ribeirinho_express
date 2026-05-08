@@ -36,6 +36,16 @@
 *   **Diálogos Undertale-style**: Balões de fala com bips rítmicos representando as vozes. NPCs e Bandidos terão "vozes" diferentes.
 *   **Modo Noturno (Hard Mode)**: Ciclo dia/noite com uso de lanterna, dificultando a visão de poças e bandidos.
 
+pensar: melhorar os sprites existentes
+
+correção: sistema de selecionar itens ta esteira. Caso exista mais de 2 itens do mesmo tipo(2 cadeiras),  esteira diminui a porcentagem de chance daquele item vir, a esteira tmb é influenciadad pelas missões, caso venha 2 missões com 3 items iguais, a esteira tem que aumentar a porcentagem de chance de vim  o item.
+
+refatoração: o sistema vai se comportar de outra maneira. Atualmente ele funciona como uma especie de arcade baseado em entregar e juntar uma pontuação em um periodo de tempo. Preciso que o sistema tenha uma proressão de dificuldade durante a perda de tempo(aumentar o spawn de bandidos e npc e velocidade em que os barcos vão embora), porem, preciso vamos implementar um sistema de melhoria de atributos do jogador e outros pontos de melhoria(Igual o megbonk).
+
+correção: melhorar o desing do hud do jogo, adicionar sprites talvez.
+
+meg-feature: multiplayer coo-op.
+
 ### 🏆 Social e Progresso
 *   **Leaderboard Local**: Ranking dos melhores scores salvo no PC.
 *   **Loja de Upgrades**: Planejada para o futuro (melhorias de velocidade, carga, etc.).
