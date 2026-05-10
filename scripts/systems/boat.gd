@@ -27,6 +27,9 @@ const ZONE_BORDER     := Color(0.45, 0.82, 1.0, 0.55)
 
 func _ready() -> void:
 	sprite.frame = randi() % sprite.vframes
+	if cargo_grid:
+		cargo_grid.visible = false
+		cargo_grid.set_process(false)
 	_atualizar_ui()
 
 func _process(delta: float) -> void:
@@ -54,16 +57,39 @@ func setup(p: OrderData, index: int, config: GridConfig = null) -> void:
 func chegar(destino: Vector2) -> void:
 	state = State.ARRIVING
 	global_position = destino + Vector2(1200, 0)
+	
+	# Partículas de rastro (opcional se o nó existir)
+	var rastro = get_node_or_null("RastroParticulas")
+	if rastro: rastro.emitting = true
+
 	var tween = create_tween()
 	tween.tween_property(self, "global_position", destino, 3.0).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	
+	# Bobbing (balanço suave)
+	var bob_tween = create_tween().set_loops()
+	bob_tween.tween_property(sprite, "position:y", 4.0, 1.2).as_relative().set_trans(Tween.TRANS_SINE)
+	bob_tween.tween_property(sprite, "position:y", -4.0, 1.2).as_relative().set_trans(Tween.TRANS_SINE)
+	
 	await tween.finished
 	state = State.DOCKED
+	if rastro: rastro.emitting = false
+	if cargo_grid:
+		cargo_grid.visible = true
+		cargo_grid.set_process(true)
 	queue_redraw()
 
 func partir() -> void:
 	if state == State.LEAVING:
 		return
 	state = State.LEAVING
+	
+	if cargo_grid:
+		cargo_grid.visible = false
+		cargo_grid.set_process(false)
+	
+	var rastro = get_node_or_null("RastroParticulas")
+	if rastro: rastro.emitting = true
+	
 	var tween = create_tween()
 	tween.tween_property(self, "global_position", global_position + Vector2(-1200, 0), 3.5).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
 	await tween.finished

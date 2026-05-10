@@ -112,11 +112,25 @@ func atualizar_pedidos_barcos(barcos: Array) -> void:
 
 		_vbox_pedidos.add_child(_criar_barra_tempo(pct))
 
+		var entregues = boat.cargo_grid.obter_itens_entregues(pedido)
+		var nomes_entregues: Array[String] = []
+		for e in entregues:
+			nomes_entregues.append(e.nome)
+
 		for item in pedido.itens_necessarios:
+			var ok = item.nome in nomes_entregues
+			# Se o item está ok, removemos da lista de nomes_entregues para o próximo duplicado não herdar o OK por erro
+			if ok:
+				var idx = nomes_entregues.find(item.nome)
+				nomes_entregues.remove_at(idx)
+
 			var item_lbl := Label.new()
-			item_lbl.text = "  - " + item.nome
+			item_lbl.text = (" [OK] " if ok else "  - ") + item.nome
 			item_lbl.add_theme_font_size_override("font_size", 11)
-			item_lbl.add_theme_color_override("font_color", Color(0.85, 0.92, 1.0))
+			if ok:
+				item_lbl.add_theme_color_override("font_color", Color(0.3, 1.0, 0.5))
+			else:
+				item_lbl.add_theme_color_override("font_color", Color(0.85, 0.92, 1.0))
 			_vbox_pedidos.add_child(item_lbl)
 
 		var spacer := Control.new()

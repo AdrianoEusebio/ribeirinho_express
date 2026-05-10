@@ -44,7 +44,16 @@ func _physics_process(delta: float) -> void:
 	else:
 		var dir := (_destino - global_position).normalized()
 		_flip_h = dir.x < 0.0
-		velocity = dir * velocidade
+		
+		# Deteção Visual e Aceleração (Implementation 12)
+		var vel_atual = velocidade
+		var player = get_tree().get_first_node_in_group("player")
+		if player and global_position.distance_to(player.global_position) < 160.0:
+			var dir_ao_player = (player.global_position - global_position).normalized()
+			if dir_ao_player.dot(dir) > 0.7: # Player na frente
+				vel_atual *= 2.4 # Acelera para empurrar
+		
+		velocity = dir * vel_atual
 		animated_sprite_2d.flip_h = _flip_h
 		animated_sprite_2d.play(RUN_ANIMATION)
 

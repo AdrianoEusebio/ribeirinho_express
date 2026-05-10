@@ -30,7 +30,7 @@ var _knockback_velocity: Vector2 = Vector2.ZERO
 var _knockback_timer: float = 0.0
 
 ## --- Queda nas poças ---
-const CHANCE_QUEDA: float = 0.75
+const CHANCE_QUEDA: float = 0.05
 const INTERVALO_QUEDA: float = 0.5
 const MAX_ITENS_CHAO: int = 30
 var _tempo_queda: float = INTERVALO_QUEDA
@@ -181,6 +181,17 @@ func _processar_queda_poca(delta: float) -> void:
 func _escorregar() -> void:
 	estado = Enums.EstadoJogador.ATORDOADO
 	_iniciar_pisca_atordoado()
+	
+	# Animação de tropeço
+	var stumble_id = randi_range(1, 4)
+	if animated_sprite_2d.sprite_frames.has_animation("stumble_" + str(stumble_id)):
+		animated_sprite_2d.play("stumble_" + str(stumble_id))
+	
+	# Partículas de água
+	var splash = get_node_or_null("SplashParticles")
+	if splash:
+		splash.restart()
+		splash.emitting = true
 
 	var container_itens := get_tree().current_scene.get_node_or_null("Itens")
 	var itens_no_chao := get_tree().get_nodes_in_group("item_chao").size()

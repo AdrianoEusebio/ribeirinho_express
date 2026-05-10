@@ -78,8 +78,15 @@ func _process(delta: float) -> void:
 
 # ─── Pontuação e dificuldade ──────────────────────────────────────────────────
 
-func _on_pedido_entregue(pontos: int) -> void:
-	pontuacao += pontos
+func _on_pedido_entregue(pontos_base: int, boat: Boat = null) -> void:
+	var final_points = pontos_base
+	
+	# Bônus por tempo (Implementation 06)
+	if boat:
+		var pct = boat.get_timer_pct()
+		final_points = int(pontos_base * (1.0 + pct)) # Bonus de até 100% se for ultra rápido
+	
+	pontuacao += final_points
 	hud.atualizar_pontuacao(pontuacao)
 	_atualizar_hud_pedidos()
 	_checar_dificuldade()
@@ -90,7 +97,6 @@ func _checar_dificuldade() -> void:
 	var novo_nivel := pontuacao / pontos_por_nivel_dificuldade
 	if novo_nivel > _nivel_dificuldade:
 		_nivel_dificuldade = novo_nivel
-		_spawnar_ladrао_extra()
 
 func _spawnar_ladrао_extra() -> void:
 	if not thief_scene or not _npcs:

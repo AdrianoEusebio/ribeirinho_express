@@ -117,6 +117,19 @@ func _roubar(player) -> void:
 	_estado = Estado.FUGINDO
 	_timer_fuga = duracao_fuga
 	_cooldown_roubo = duracao_fuga + 1.0
+func _mostrar_feedback_frustracao() -> void:
+	var label := Label.new()
+	label.text = "?!#"
+	label.add_theme_color_override("font_color", Color(1.0, 0.4, 0.0))
+	label.add_theme_font_size_override("font_size", 18)
+	label.z_index = 150
+	label.position = Vector2(-15, -50)
+	add_child(label)
+	
+	var tween := create_tween()
+	tween.tween_property(label, "position:y", label.position.y - 30.0, 0.8)
+	tween.parallel().tween_property(label, "modulate:a", 0.0, 0.8)
+	tween.chain().tween_callback(label.queue_free)
 
 func _player_na_doca(player) -> bool:
 	for doca in get_tree().get_nodes_in_group("doca"):
@@ -129,10 +142,23 @@ func _player_na_doca(player) -> bool:
 func _tentar_roubar_por_contato(player) -> void:
 	if _estado != Estado.PERSEGUINDO or _cooldown_roubo > 0:
 		return
-	if player.itens_carregados.is_empty() or _player_na_doca(player):
+	
+	# Zona Segura (Implementation 11)
+	if _player_na_doca(player):
+		if _estado == Estado.PERSEGUINDO:
+			_estado = Estado.PATRULHA # Desiste da perseguição
+			_mostrar_feedback_frustracao()
 		return
+		
 	if _encostou_no_player(player):
-		_roubar(player)
+		if player.itens_carregados.is_empty():
+			# Repulsão se não houver itens (Implementation 11)
+			var dir = (player.global_position - global_position).normalized()
+			player.aplicar_knockback(dir, 420.0)
+			_estado = Estado.PATRULHA
+			_cooldown_roubo = 1.0
+		else:
+			_roubar(player)
 
 func _encostou_no_player(player) -> bool:
 	for collision_index in range(get_slide_collision_count()):

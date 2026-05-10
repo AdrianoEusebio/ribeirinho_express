@@ -59,8 +59,8 @@ func _spawn_boat(index: int) -> void:
 	add_child(new_boat)
 	boats[index] = new_boat
 
-	var p      := _get_random_pedido()
 	var config := _get_random_grid_config()
+	var p      := _get_random_pedido(config.max_itens_recomendados if config else 0)
 	new_boat.setup(p, index, config)
 
 	new_boat.boat_finished.connect(_on_boat_finished)
@@ -74,7 +74,7 @@ func _spawn_boat(index: int) -> void:
 # ─── Callbacks de barcos ──────────────────────────────────────────────────────
 
 func _on_boat_finished(boat) -> void:
-	pedido_entregue.emit(boat.pedido.recompensa_pontos)
+	pedido_entregue.emit(boat.pedido.recompensa_pontos, boat)
 	boats[boat.spot_index] = null
 	_agendar_spawn()
 
@@ -104,13 +104,26 @@ func _tem_algum_barco() -> bool:
 			return true
 	return false
 
-func _get_random_pedido() -> OrderData:
+func _get_random_pedido(max_itens: int = 0) -> OrderData:
 	if pool_pedidos.is_empty(): return null
-	return pool_pedidos[randi() % pool_pedidos.size()]
+	var p = pool_pedidos[randi() % pool_pedidos.size()].duplicate()
+	if max_itens > 0 and p.itens_necessarios.size() > max_itens:
+		p.itens_necessarios = p.itens_necessarios.slice(0, max_itens)
+	return p
 
 func _get_random_grid_config() -> GridConfig:
 	if grid_pool.is_empty(): return null
 	return grid_pool[randi() % grid_pool.size()]
+
+func aumentar_dificuldade(nivel: int) -> void:
+	# Reduz o delay de spawn em 10% por nível, até um limite
+	var fator = max(0.4, 1.0 - (nivel * 0.1))
+	# Nota: Como são constantes, vamos apenas aplicar o fator no cálculo do delay em _agendar_spawn
+	# Ou podemos mudar as constantes para variáveis se quisermos ser mais limpos.
+	# Por enquanto, vou apenas registrar o nível.
+	_nivel_atual = nivel
+
+var _nivel_atual: int = 0
 
 # ─── Consultas externas ───────────────────────────────────────────────────────
 
