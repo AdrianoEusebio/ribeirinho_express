@@ -10,28 +10,28 @@ Os itens abaixo devem ser criados e categorizados no sistema de `ItemData`.
 Sugerimos o uso de bordas coloridas ou ícones no HUD para identificar a categoria rapidamente.
 
 - **🪨 Pesados (Ocupam 2x2 ou layouts em L/T)**:
-    - `geladeira`: Alta e estreita.
-    - `maquina_lavar`: Quadrada e pesada.
-    - `sofa`: Grande (pode ser 3x2 ou 2x3).
-    - `armario`: Ocupa muito espaço vertical.
-    - `botijao_gas`: Clássico, redondo e pesado.
-    - `roda_carro`: Formato circular no grid (bloqueia cantos).
-    - **Sugestão**: `saco_farinha` (Essencial para o tema).
+	- `geladeira`: Alta e estreita.
+	- `maquina_lavar`: Quadrada e pesada.
+	- `sofa`: Grande (pode ser 3x2 ou 2x3).
+	- `armario`: Ocupa muito espaço vertical.
+	- `botijao_gas`: Clássico, redondo e pesado.
+	- `roda_carro`: Formato circular no grid (bloqueia cantos).
+	- **Sugestão**: `saco_farinha` (Essencial para o tema).
 
 - **📦 Médios (Ocupam 1x2 ou 2x1)**:
-    - `microondas`: Retangular pequeno.
-    - `tv`: Fina mas larga.
-    - `caixa_default`: A famosa "Caixa de Papelão" multiuso.
-    - **Sugestão**: `cesta_acai` (Item icônico da região).
-    - **Sugestão**: `caixa_isopor` (Comum em transportes fluviais).
+	- `microondas`: Retangular pequeno.
+	- `tv`: Fina mas larga.
+	- `caixa_default`: A famosa "Caixa de Papelão" multiuso.
+	- **Sugestão**: `cesta_acai` (Item icônico da região).
+	- **Sugestão**: `caixa_isopor` (Comum em transportes fluviais).
 
 - **💎 Fráteis (Ocupam 1x1 - Quebram se caírem)**:
-    - `abajur`: Pequeno e delicado.
-    - `radio_pilha`: Item retrô ribeirinho.
-    - `caixa_copos_vidro`: Som de vidro quebrando ao cair.
-    - `vaso_planta`: Requer cuidado no transporte.
-    - `caixa_remedios`: Item vital de entrega.
-    - **Sugestão**: `cesta_ovos` (Muito frágil).
+	- `abajur`: Pequeno e delicado.
+	- `radio_pilha`: Item retrô ribeirinho.
+	- `caixa_copos_vidro`: Som de vidro quebrando ao cair.
+	- `vaso_planta`: Requer cuidado no transporte.
+	- `caixa_remedios`: Item vital de entrega.
+	- **Sugestão**: `cesta_ovos` (Muito frágil).
 
 ### 2. Estados de Animação do Player
 O `AnimatedSprite2D` do jogador precisa das seguintes sequências (Frames 32x32):

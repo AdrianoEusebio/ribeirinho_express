@@ -13,6 +13,7 @@ enum State { ARRIVING, DOCKED, LEAVING }
 var state: State = State.ARRIVING
 var pedido: OrderData = null
 var spot_index: int = 0
+var pedido_pronto: bool = false
 
 var _tempo_restante: float = 0.0
 var _tempo_limite: float = 0.0
@@ -43,10 +44,14 @@ func _process(delta: float) -> void:
 		_tempo_limite = 0.0
 		boat_timeout.emit(self)
 		partir()
+		return
+	if pedido_pronto:
+		_processar_confirmacao_entrega()
 
 func setup(p: OrderData, index: int, config: GridConfig = null) -> void:
 	pedido = p
 	spot_index = index
+	pedido_pronto = false
 	if pedido:
 		_tempo_limite   = pedido.tempo_limite
 		_tempo_restante = _tempo_limite
@@ -106,6 +111,8 @@ func _atualizar_ui() -> void:
 	var texto = pedido.nome + ":\n"
 	for item in pedido.itens_necessarios:
 		texto += "- " + item.nome + "\n"
+	if pedido_pronto:
+		texto += "\nE para entregar"
 	label_pedido.text = texto
 
 ## Atualiza o balão com checkmarks conforme itens são colocados no grid.
@@ -121,6 +128,8 @@ func _atualizar_ui_com_progresso() -> void:
 	for item_pedido in pedido.itens_necessarios:
 		var ok = item_pedido.nome in nomes_entregues
 		texto += ("✓ " if ok else "- ") + item_pedido.nome + "\n"
+	if pedido_pronto:
+		texto += "\nPedido pronto! Aperte E"
 	label_pedido.text = texto
 
 # ─── Verificação de pedido ────────────────────────────────────────────────────
@@ -134,10 +143,33 @@ func verificar_pedido() -> bool:
 	if state != State.DOCKED or pedido == null:
 		return false
 	if cargo_grid.verificar_entrega_por_pedido(pedido):
-		boat_finished.emit(self)
-		partir()
+		if not pedido_pronto:
+			pedido_pronto = true
+			_atualizar_ui_com_progresso()
+			_mostrar_mensagem("Pedido pronto no Barco %d. Aperte E para entregar." % (spot_index + 1), "sucesso", 2.4)
 		return true
 	return false
+
+func confirmar_entrega() -> bool:
+	if state != State.DOCKED or not pedido_pronto:
+		return false
+	boat_finished.emit(self)
+	partir()
+	return true
+
+func _processar_confirmacao_entrega() -> void:
+	var player = get_tree().get_first_node_in_group("player")
+	if not player:
+		return
+	if global_position.distance_to(player.global_position) > ZONE_RADIUS:
+		return
+	if Input.is_action_just_pressed("interact"):
+		confirmar_entrega()
+
+func _mostrar_mensagem(texto: String, tipo: String = "info", duracao: float = 2.0) -> void:
+	var hud = get_tree().get_first_node_in_group("hud")
+	if hud and hud.has_method("mostrar_mensagem"):
+		hud.mostrar_mensagem(texto, tipo, duracao)
 
 # ─── Barra de tempo ───────────────────────────────────────────────────────────
 
@@ -154,6 +186,8 @@ func _draw() -> void:
 	# Timer bar
 	if _tempo_limite <= 0.0:
 		return
+	if pedido_pronto:
+		draw_string(ThemeDB.fallback_font, Vector2(-72, BAR_Y - 8), "PRONTO - E", HORIZONTAL_ALIGNMENT_CENTER, 144, 14, Color(0.35, 1.0, 0.45))
 	var pct := clampf(_tempo_restante / _tempo_limite, 0.0, 1.0)
 	var bx  := -BAR_W / 2.0
 	draw_rect(Rect2(bx, BAR_Y, BAR_W, BAR_H), Color(0.15, 0.15, 0.15, 0.85))

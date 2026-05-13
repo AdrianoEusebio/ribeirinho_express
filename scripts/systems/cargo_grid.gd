@@ -87,6 +87,7 @@ func _on_item_quebrado(item_data: ItemData) -> void:
 		var sprite = item_to_sprite[item_data]
 		sprite.queue_free()
 		item_to_sprite.erase(item_data)
+	_mostrar_mensagem("%s quebrou no empilhamento." % item_data.nome, "erro", 2.0)
 
 func _on_item_caiu(item_data: ItemData, nova_pos: Vector2i) -> void:
 	if item_to_sprite.has(item_data):
@@ -155,6 +156,8 @@ func _processar_preview(player) -> void:
 			_colocar_item_no_grid(player, grid_pos, formato, Vector2(escala_x, escala_y))
 	else:
 		preview_sprite.modulate = Color(1, 0, 0, 0.5)
+		if Input.is_action_just_pressed("interact"):
+			_mostrar_mensagem(grid.get_motivo_bloqueio(item_em_preview, grid_pos, formato), "erro")
 
 func _colocar_item_no_grid(player, grid_pos, formato, escala_final: Vector2) -> void:
 	var item_data = player.itens_carregados.pop_back()
@@ -173,6 +176,7 @@ func _colocar_item_no_grid(player, grid_pos, formato, escala_final: Vector2) -> 
 	player._atualizar_estado()
 	player._atualizar_visual_itens()
 
+	_mostrar_mensagem("%s colocado no barco." % item_data.nome, "info", 1.4)
 	_on_item_colocado()
 
 func _on_item_colocado() -> void:
@@ -192,6 +196,11 @@ func verificar_entrega_por_pedido(pedido: OrderData) -> bool:
 
 	var entregues = obter_itens_entregues(pedido)
 	return entregues.size() >= pedido.itens_necessarios.size()
+
+func _mostrar_mensagem(texto: String, tipo: String = "info", duracao: float = 2.0) -> void:
+	var hud = get_tree().get_first_node_in_group("hud")
+	if hud and hud.has_method("mostrar_mensagem"):
+		hud.mostrar_mensagem(texto, tipo, duracao)
 
 func _limpar_grid() -> void:
 	for child in container_itens.get_children():

@@ -64,7 +64,7 @@ func process_interaction() -> void:
 	# PEGAR ITEM (E)
 	if Input.is_action_just_pressed("interact"):
 		if itens_carregados.size() >= LIMITE_ITENS:
-			print("Mãos cheias!")
+			_mostrar_mensagem("Maos cheias. Solte ou entregue algo primeiro.", "alerta")
 			return
 
 		var areas = hitbox.get_overlapping_areas()
@@ -77,9 +77,10 @@ func process_interaction() -> void:
 					itens_carregados.append(item_coletado)
 					_atualizar_estado()
 					_atualizar_visual_itens()
+					_mostrar_mensagem("%s coletado." % item_coletado.nome, "info", 1.4)
 					break
 				else:
-					print("Muito pesado ou volumoso para o que já carrego!")
+					_mostrar_mensagem("Carga pesada demais para carregar junto.", "erro")
 	
 	# SOLTAR ITEM (Q) - Solta o último item pego
 	if Input.is_action_just_pressed("drop_item"):
@@ -120,6 +121,7 @@ func _soltar_item() -> void:
 	
 	_atualizar_estado()
 	_atualizar_visual_itens()
+	_mostrar_mensagem("%s solto no chao." % item_para_soltar.nome, "info", 1.3)
 
 func _atualizar_estado() -> void:
 	if itens_carregados.size() == 0:
@@ -181,6 +183,7 @@ func _processar_queda_poca(delta: float) -> void:
 func _escorregar() -> void:
 	estado = Enums.EstadoJogador.ATORDOADO
 	_iniciar_pisca_atordoado()
+	_mostrar_mensagem("Voce escorregou e a carga caiu!", "alerta", 2.0)
 	
 	# Animação de tropeço
 	var stumble_id = randi_range(1, 4)
@@ -257,6 +260,7 @@ func _parar_pisca_atordoado() -> void:
 	modulate = Color.WHITE
 
 func mostrar_indicador_roubo() -> void:
+	_mostrar_mensagem("Item roubado! Recupere outra carga.", "erro", 2.0)
 	var label := Label.new()
 	label.text = "ROUBADO!"
 	label.add_theme_color_override("font_color", Color(1.0, 0.15, 0.15))
@@ -384,3 +388,8 @@ func _get_doca_alvo() -> Dock:
 			menor_distancia = distancia
 			doca_mais_proxima = doca
 	return doca_mais_proxima
+
+func _mostrar_mensagem(texto: String, tipo: String = "info", duracao: float = 2.0) -> void:
+	var hud = get_tree().get_first_node_in_group("hud")
+	if hud and hud.has_method("mostrar_mensagem"):
+		hud.mostrar_mensagem(texto, tipo, duracao)

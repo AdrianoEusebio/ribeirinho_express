@@ -23,12 +23,18 @@ func bloquear_celulas(bloqueadas: Array[Vector2i]) -> void:
 	celulas_bloqueadas = bloqueadas
 
 func pode_colocar(item: ItemData, pos: Vector2i, formato: Array[Vector2i]) -> bool:
+	return get_motivo_bloqueio(item, pos, formato).is_empty()
+
+func get_motivo_bloqueio(item: ItemData, pos: Vector2i, formato: Array[Vector2i]) -> String:
 	for celula_relativa in formato:
 		var x = pos.x + celula_relativa.x
 		var y = pos.y + celula_relativa.y
-		if x < 0 or x >= largura or y < 0 or y >= altura: return false
-		if celulas[x][y] != null: return false
-		if Vector2i(x, y) in celulas_bloqueadas: return false
+		if x < 0 or x >= largura or y < 0 or y >= altura:
+			return "Fora do espaco do barco."
+		if celulas[x][y] != null:
+			return "Esse espaco ja esta ocupado."
+		if Vector2i(x, y) in celulas_bloqueadas:
+			return "Essa parte do barco esta bloqueada."
 	
 	if item.categoria == Enums.Categoria.PESADO:
 		var toca_chao = false
@@ -36,7 +42,8 @@ func pode_colocar(item: ItemData, pos: Vector2i, formato: Array[Vector2i]) -> bo
 			if (pos.y + celula_relativa.y) == altura - 1:
 				toca_chao = true
 				break
-		if not toca_chao: return false
+		if not toca_chao:
+			return "Carga pesada precisa tocar o fundo do barco."
 	
 	# Regra de SUPORTE (Não deixar voar)
 	var tem_suporte = false
@@ -46,9 +53,10 @@ func pode_colocar(item: ItemData, pos: Vector2i, formato: Array[Vector2i]) -> bo
 		if cy == altura - 1 or (cy + 1 < altura and celulas[cx][cy + 1] != null):
 			tem_suporte = true
 			break
-	if not tem_suporte: return false
+	if not tem_suporte:
+		return "A carga precisa de apoio por baixo."
 				
-	return true
+	return ""
 
 func colocar_item(item: ItemData, pos: Vector2i, formato: Array[Vector2i]) -> void:
 	for celula_relativa in formato:

@@ -25,6 +25,9 @@
 [ext_resource type="PackedScene" uid="uid://prop0000001" path="res://scenes/prop.tscn" id="21_prop"]
 [ext_resource type="Texture2D" uid="uid://b1p1nwgfw7k84" path="res://assets/assets/pneu.png" id="24_y6deb"]
 [ext_resource type="Texture2D" uid="uid://dq2vy0l1i37tj" path="res://assets/assets/Design sem nome.png" id="25_og1vs"]
+[ext_resource type="Resource" uid="uid://order0000004" path="res://resources/pedidos/pedido_saude_comunitaria.tres" id="26_order"]
+[ext_resource type="Resource" uid="uid://order0000005" path="res://resources/pedidos/pedido_cesta_ribeirinha.tres" id="27_order"]
+[ext_resource type="Resource" uid="uid://order0000006" path="res://resources/pedidos/pedido_mudanca_urgente.tres" id="28_order"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_eb6dy"]
 size = Vector2(8.75, 7.25)
@@ -54,7 +57,7 @@ position = Vector2(750, 1230)
 
 [node name="Doca" parent="." unique_id=690372664 instance=ExtResource("10_dock")]
 position = Vector2(500, 1300)
-pool_pedidos = Array[ExtResource("12_yc10j")]([ExtResource("12_order"), ExtResource("13_order"), ExtResource("14_order")])
+pool_pedidos = Array[ExtResource("12_yc10j")]([ExtResource("12_order"), ExtResource("13_order"), ExtResource("14_order"), ExtResource("26_order"), ExtResource("27_order"), ExtResource("28_order")])
 
 [node name="HUD" parent="." unique_id=693470817 instance=ExtResource("11_hud")]
 

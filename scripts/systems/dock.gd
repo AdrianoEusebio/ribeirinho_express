@@ -1,7 +1,7 @@
 class_name Dock
 extends Node2D
 
-signal pedido_entregue(pontos: int)
+signal pedido_entregue(pontos: int, boat)
 signal barco_atracou
 
 @export var pool_pedidos: Array[OrderData] = []
@@ -44,6 +44,7 @@ func _agendar_spawn() -> void:
 		delay = randf_range(DELAY_PORTO_OCUPADO.x, DELAY_PORTO_OCUPADO.y)
 	else:
 		delay = randf_range(DELAY_PORTO_VAZIO.x, DELAY_PORTO_VAZIO.y)
+	delay *= _get_fator_dificuldade()
 	_executar_spawn_apos(slot, delay)
 
 func _executar_spawn_apos(slot: int, delay: float) -> void:
@@ -67,6 +68,7 @@ func _spawn_boat(index: int) -> void:
 	new_boat.boat_timeout.connect(_on_boat_timeout)
 
 	barco_atracou.emit()
+	_mostrar_mensagem("Barco %d chegou com novo pedido." % (index + 1), "info", 1.8)
 
 	var target_pos := global_position + spot_positions[index]
 	new_boat.chegar(target_pos)
@@ -79,6 +81,7 @@ func _on_boat_finished(boat) -> void:
 	_agendar_spawn()
 
 func _on_boat_timeout(boat) -> void:
+	_mostrar_mensagem("Barco %d perdeu o prazo." % (boat.spot_index + 1), "alerta", 2.0)
 	boats[boat.spot_index] = null
 	_agendar_spawn()
 
@@ -116,14 +119,17 @@ func _get_random_grid_config() -> GridConfig:
 	return grid_pool[randi() % grid_pool.size()]
 
 func aumentar_dificuldade(nivel: int) -> void:
-	# Reduz o delay de spawn em 10% por nível, até um limite
-	var fator = max(0.4, 1.0 - (nivel * 0.1))
-	# Nota: Como são constantes, vamos apenas aplicar o fator no cálculo do delay em _agendar_spawn
-	# Ou podemos mudar as constantes para variáveis se quisermos ser mais limpos.
-	# Por enquanto, vou apenas registrar o nível.
 	_nivel_atual = nivel
 
 var _nivel_atual: int = 0
+
+func _get_fator_dificuldade() -> float:
+	return max(0.4, 1.0 - (_nivel_atual * 0.1))
+
+func _mostrar_mensagem(texto: String, tipo: String = "info", duracao: float = 2.0) -> void:
+	var hud = get_tree().get_first_node_in_group("hud")
+	if hud and hud.has_method("mostrar_mensagem"):
+		hud.mostrar_mensagem(texto, tipo, duracao)
 
 # ─── Consultas externas ───────────────────────────────────────────────────────
 

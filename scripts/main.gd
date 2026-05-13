@@ -3,7 +3,7 @@ extends Node2D
 enum Estado { INICIANDO, JOGANDO, ENCERRADO }
 
 @export var tempo_total: float = 180.0
-@export var pontuacao_vitoria: int = 9999  # sem limite por padrão — vence pelo tempo
+@export var pontuacao_vitoria: int = 900
 
 # Dificuldade adaptativa
 @export var thief_scene: PackedScene = preload("res://scenes/thief.tscn")
@@ -21,6 +21,7 @@ var _timer_hud: float = 0.0
 
 func _ready() -> void:
 	tempo_restante = tempo_total
+	hud.configurar_meta_pontuacao(pontuacao_vitoria)
 	hud.atualizar_tempo(tempo_restante)
 	hud.atualizar_pontuacao(pontuacao)
 
@@ -80,14 +81,20 @@ func _process(delta: float) -> void:
 
 func _on_pedido_entregue(pontos_base: int, boat: Boat = null) -> void:
 	var final_points = pontos_base
+	var bonus_tempo = 0
 	
 	# Bônus por tempo (Implementation 06)
 	if boat:
 		var pct = boat.get_timer_pct()
 		final_points = int(pontos_base * (1.0 + pct)) # Bonus de até 100% se for ultra rápido
+		bonus_tempo = final_points - pontos_base
 	
 	pontuacao += final_points
 	hud.atualizar_pontuacao(pontuacao)
+	if bonus_tempo > 0:
+		hud.mostrar_mensagem("Entrega concluida: +%d pts (+%d tempo)." % [final_points, bonus_tempo], "sucesso", 2.5)
+	else:
+		hud.mostrar_mensagem("Entrega concluida: +%d pts." % final_points, "sucesso", 2.5)
 	_atualizar_hud_pedidos()
 	_checar_dificuldade()
 	if pontuacao >= pontuacao_vitoria:
@@ -97,8 +104,13 @@ func _checar_dificuldade() -> void:
 	var novo_nivel := pontuacao / pontos_por_nivel_dificuldade
 	if novo_nivel > _nivel_dificuldade:
 		_nivel_dificuldade = novo_nivel
+		for doca in get_tree().get_nodes_in_group("doca"):
+			if doca.has_method("aumentar_dificuldade"):
+				doca.aumentar_dificuldade(_nivel_dificuldade)
+		_spawnar_ladrao_extra()
+		hud.mostrar_mensagem("O porto ficou mais movimentado.", "alerta", 2.0)
 
-func _spawnar_ladrао_extra() -> void:
+func _spawnar_ladrao_extra() -> void:
 	if not thief_scene or not _npcs:
 		return
 	var ladroes := get_tree().get_nodes_in_group("thief")

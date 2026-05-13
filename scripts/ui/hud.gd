@@ -6,15 +6,20 @@ extends CanvasLayer
 @onready var botao_reiniciar: Button = $Painel/VBox/BotaoReiniciar
 
 var _label_countdown: Label = null
+var _label_mensagem: Label = null
 var _shake_timer: float = 0.0
 var _shake_ativo: bool = false
 var _tempo_atual: float = 999.0
+var _meta_pontuacao: int = 0
+var _mensagem_tween: Tween = null
 
 var _painel_pedidos: PanelContainer = null
 var _vbox_pedidos: VBoxContainer = null
 
 func _ready() -> void:
+	add_to_group("hud")
 	_criar_label_countdown()
+	_criar_label_mensagem()
 	_estilizar_painel_principal()
 	_criar_painel_pedidos()
 
@@ -105,9 +110,12 @@ func atualizar_pedidos_barcos(barcos: Array) -> void:
 		var pct: float = boat.get_timer_pct() if boat.has_method("get_timer_pct") else 1.0
 
 		var header := Label.new()
-		header.text = "%s (Barco %d)" % [pedido.nome, boat.spot_index + 1]
+		var pronto := false
+		if boat != null:
+			pronto = boat.pedido_pronto
+		header.text = "%s (Barco %d)%s" % [pedido.nome, boat.spot_index + 1, " - PRONTO" if pronto else ""]
 		header.add_theme_font_size_override("font_size", 12)
-		header.add_theme_color_override("font_color", Color(0.65, 0.88, 1.0))
+		header.add_theme_color_override("font_color", Color(0.35, 1.0, 0.45) if pronto else Color(0.65, 0.88, 1.0))
 		_vbox_pedidos.add_child(header)
 
 		_vbox_pedidos.add_child(_criar_barra_tempo(pct))
@@ -185,6 +193,26 @@ func _posicionar_countdown() -> void:
 	var vp: Vector2 = get_viewport().get_visible_rect().size
 	_label_countdown.position = vp / 2.0 - _label_countdown.size / 2.0
 
+func _criar_label_mensagem() -> void:
+	_label_mensagem = Label.new()
+	_label_mensagem.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_label_mensagem.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_label_mensagem.add_theme_font_size_override("font_size", 24)
+	_label_mensagem.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.8))
+	_label_mensagem.add_theme_constant_override("shadow_offset_x", 2)
+	_label_mensagem.add_theme_constant_override("shadow_offset_y", 2)
+	_label_mensagem.size = Vector2(620, 48)
+	_label_mensagem.visible = false
+	_label_mensagem.z_index = 180
+	add_child(_label_mensagem)
+	_posicionar_mensagem()
+
+func _posicionar_mensagem() -> void:
+	if not _label_mensagem:
+		return
+	var vp: Vector2 = get_viewport().get_visible_rect().size
+	_label_mensagem.position = Vector2(vp.x / 2.0 - _label_mensagem.size.x / 2.0, 96.0)
+
 func mostrar_countdown(numero: int) -> void:
 	if not _label_countdown:
 		return
@@ -204,6 +232,32 @@ func mostrar_countdown(numero: int) -> void:
 func ocultar_countdown() -> void:
 	if _label_countdown:
 		_label_countdown.visible = false
+
+func mostrar_mensagem(texto: String, tipo: String = "info", duracao: float = 2.0) -> void:
+	if not _label_mensagem:
+		return
+	_posicionar_mensagem()
+	_label_mensagem.text = texto
+	_label_mensagem.visible = true
+	_label_mensagem.modulate.a = 1.0
+	_label_mensagem.scale = Vector2(1.08, 1.08)
+	match tipo:
+		"sucesso":
+			_label_mensagem.add_theme_color_override("font_color", Color(0.35, 1.0, 0.45))
+		"alerta":
+			_label_mensagem.add_theme_color_override("font_color", Color(1.0, 0.78, 0.16))
+		"erro":
+			_label_mensagem.add_theme_color_override("font_color", Color(1.0, 0.28, 0.25))
+		_:
+			_label_mensagem.add_theme_color_override("font_color", Color(0.72, 0.9, 1.0))
+
+	if _mensagem_tween:
+		_mensagem_tween.kill()
+	_mensagem_tween = create_tween()
+	_mensagem_tween.tween_property(_label_mensagem, "scale", Vector2.ONE, 0.16)
+	_mensagem_tween.tween_interval(duracao)
+	_mensagem_tween.tween_property(_label_mensagem, "modulate:a", 0.0, 0.35)
+	_mensagem_tween.tween_callback(func(): _label_mensagem.visible = false)
 
 # ─── Timer ────────────────────────────────────────────────────────────────────
 
@@ -228,11 +282,17 @@ func atualizar_tempo(segundos: float) -> void:
 # ─── Pontuação ────────────────────────────────────────────────────────────────
 
 func atualizar_pontuacao(pts: int) -> void:
-	label_pontuacao.text = "Pontuacao: %d" % pts
+	if _meta_pontuacao > 0:
+		label_pontuacao.text = "Pontuacao: %d / %d" % [pts, _meta_pontuacao]
+	else:
+		label_pontuacao.text = "Pontuacao: %d" % pts
 	label_pontuacao.scale = Vector2(1.25, 1.25)
 	var tween := create_tween()
 	tween.tween_property(label_pontuacao, "scale", Vector2(1.0, 1.0), 0.25) \
 		.set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
+
+func configurar_meta_pontuacao(meta: int) -> void:
+	_meta_pontuacao = meta
 
 # ─── Resultado ────────────────────────────────────────────────────────────────
 
