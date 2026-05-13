@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://item_cesta_acai"]
+
+[ext_resource type="Script" uid="uid://c7rc5rbr3iu3m" path="res://scripts/resources/item_data.gd" id="1_mte50"]
+
+[resource]
+script = ExtResource("1_mte50")
+nome = "Cesta de Açaí"
+cor = Color(0.3, 0.0, 0.3, 1)
+massa = 15.0
+tamanho = Vector2i(1, 1)
+categoria = 1
+eh_essencial = true
+prioridade = 5
+descricao = "O ouro roxo da região. Manuseie com agilidade."

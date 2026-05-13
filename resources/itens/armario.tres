@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://item_armario"]
+
+[ext_resource type="Script" uid="uid://c7rc5rbr3iu3m" path="res://scripts/resources/item_data.gd" id="1_mte50"]
+
+[resource]
+script = ExtResource("1_mte50")
+nome = "Armário"
+cor = Color(0.5, 0.35, 0.2, 1)
+massa = 60.0
+tamanho = Vector2i(2, 3)
+categoria = 0
+prioridade = 7
+descricao = "Alto e instável. Coloque no fundo do barco."

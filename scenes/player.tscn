@@ -306,34 +306,19 @@ animations = [{
 "frames": [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_t4otl")
-}],
-"loop": true,
-"name": &"stumble_1",
-"speed": 5.0
 }, {
-"frames": [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_j2b1d")
-}],
-"loop": true,
-"name": &"stumble_2",
-"speed": 5.0
 }, {
-"frames": [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_cs1tg")
-}],
-"loop": true,
-"name": &"stumble_3",
-"speed": 5.0
 }, {
-"frames": [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_2dvfe")
 }],
-"loop": true,
-"name": &"stumble_4",
-"speed": 5.0
+"loop": false,
+"name": &"stumble",
+"speed": 8.0
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_g2els"]

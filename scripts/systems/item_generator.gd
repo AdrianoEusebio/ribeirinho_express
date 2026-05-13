@@ -12,6 +12,24 @@ const TODOS_ITENS := [
 	preload("res://resources/itens/geladeira.tres"),
 	preload("res://resources/itens/medicamento.tres"),
 	preload("res://resources/itens/saco_graos.tres"),
+	# Novos Itens - Pesados
+	preload("res://resources/itens/maquina_lavar.tres"),
+	preload("res://resources/itens/sofa.tres"),
+	preload("res://resources/itens/armario.tres"),
+	preload("res://resources/itens/botijao_gas.tres"),
+	preload("res://resources/itens/roda_caminhao.tres"),
+	# Novos Itens - Médios
+	preload("res://resources/itens/microondas.tres"),
+	preload("res://resources/itens/televisao.tres"),
+	preload("res://resources/itens/cesta_acai.tres"),
+	preload("res://resources/itens/caixa_isopor.tres"),
+	preload("res://resources/itens/caixa_suprimentos.tres"),
+	# Novos Itens - Frágeis
+	preload("res://resources/itens/abajur.tres"),
+	preload("res://resources/itens/radio_pilha.tres"),
+	preload("res://resources/itens/caixa_copos.tres"),
+	preload("res://resources/itens/vaso_planta.tres"),
+	preload("res://resources/itens/cesta_ovos.tres"),
 ]
 const ITEM_SLOT_SCRIPT := preload("res://scripts/systems/item_slot.gd")
 
@@ -37,9 +55,25 @@ var _acabou_de_descarregar: float = 0.0
 @onready var _container: Node2D = $Container
 
 
+var _sprite_esteira: Sprite2D
+var _esteira_timer: float = 0.0
+
 func _ready() -> void:
 	max_slots = max(1, max_slots)
 	_garantir_slots_prontos()
+
+	# Configurar Sprite da Esteira Animada
+	_sprite_esteira = Sprite2D.new()
+	_sprite_esteira.texture = load("res://assets/assets/conveyorbelt605x60.webp")
+	_sprite_esteira.region_enabled = true
+	# 600x238 total -> 4 frames de ~59.5px altura
+	_sprite_esteira.region_rect = Rect2(0, 0, 600, 59)
+	_sprite_esteira.centered = false
+	_sprite_esteira.position = Vector2(TRUCK_W + 22.0, 10.0)
+	# Escala para a largura da doca (350 / 600)
+	_sprite_esteira.scale = Vector2(DOCK_W / 600.0, 1.0)
+	add_child(_sprite_esteira)
+	move_child(_sprite_esteira, 0)
 
 	_timer.wait_time = intervalo_remessa
 	_timer.one_shot = true
@@ -50,6 +84,13 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	_verificar_slots_liberados()
+	
+	# Animação da Esteira
+	if _sprite_esteira:
+		_esteira_timer += delta * 10.0 # Velocidade da animação
+		var frame := int(_esteira_timer) % 4
+		_sprite_esteira.region_rect.position.y = frame * (238.0 / 4.0)
+
 	if _acabou_de_descarregar > 0.0:
 		_acabou_de_descarregar = maxf(0.0, _acabou_de_descarregar - delta)
 		queue_redraw()
@@ -75,13 +116,18 @@ func _garantir_slots_prontos() -> void:
 func _verificar_slots_liberados() -> void:
 	_garantir_slots_prontos()
 	var mudou := false
+
 	for i in max_slots:
-		if _slot_nodes[i] != null and not is_instance_valid(_slot_nodes[i]):
-			_slot_nodes[i] = null
-			mudou = true
+		var node = _slot_nodes[i]
+		if node != null:
+			# Verifica se o nodo ainda é válido E não está agendado para deleção
+			if not is_instance_valid(node) or node.is_queued_for_deletion():
+				_slot_nodes[i] = null
+				mudou = true
 
 	if mudou:
 		queue_redraw()
+		# Garante que o gerador retome se houver espaço e o timer estiver parado
 		if _tem_slot_livre() and _timer != null and _timer.is_stopped():
 			_timer.start()
 
@@ -93,7 +139,8 @@ func _tem_slot_livre() -> bool:
 func _primeiro_slot_livre() -> int:
 	_garantir_slots_prontos()
 	for i in max_slots:
-		if _slot_nodes[i] == null or not is_instance_valid(_slot_nodes[i]):
+		var node = _slot_nodes[i]
+		if node == null or not is_instance_valid(node) or node.is_queued_for_deletion():
 			return i
 	return -1
 
@@ -203,7 +250,7 @@ func _draw() -> void:
 	var descarga_cheia := not _tem_slot_livre()
 
 	_desenhar_caminhao(font)
-	_desenhar_area_descarga(font, descarga_cheia)
+	# _desenhar_area_descarga(font, descarga_cheia)
 	_desenhar_slots(font)
 
 	if descarga_cheia:

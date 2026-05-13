@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://item_caixa_isopor"]
+
+[ext_resource type="Script" uid="uid://c7rc5rbr3iu3m" path="res://scripts/resources/item_data.gd" id="1_mte50"]
+
+[resource]
+script = ExtResource("1_mte50")
+nome = "Caixa de Isopor"
+cor = Color(0.9, 0.95, 1.0, 1)
+massa = 4.0
+tamanho = Vector2i(1, 2)
+categoria = 1
+prioridade = 2
+descricao = "Leve mas volumosa. Mantém as coisas frias."

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://item_maquina_lavar"]
+
+[ext_resource type="Script" uid="uid://c7rc5rbr3iu3m" path="res://scripts/resources/item_data.gd" id="1_mte50"]
+
+[resource]
+script = ExtResource("1_mte50")
+nome = "Máquina de Lavar"
+cor = Color(0.8, 0.8, 0.85, 1)
+massa = 50.0
+tamanho = Vector2i(2, 2)
+categoria = 0
+prioridade = 5
+descricao = "Pesada e desengonçada. Só pode ir no chão."

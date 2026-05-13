@@ -263,13 +263,13 @@ func _setup_background() -> void:
 			grid_lines.draw_line(
 				Vector2(x * tamanho_celula, 0),
 				Vector2(x * tamanho_celula, lh),
-				Color(1, 1, 1, 0.45), 1.0
+				Color(1, 1, 1, 0.45), 1.2, true # Espessura 1.2 e antialiasing ligado
 			)
 		# Linhas horizontais
 		for y in range(altura + 1):
 			grid_lines.draw_line(
 				Vector2(0, y * tamanho_celula),
 				Vector2(lw, y * tamanho_celula),
-				Color(1, 1, 1, 0.45), 1.0
+				Color(1, 1, 1, 0.45), 1.2, true # Espessura 1.2 e antialiasing ligado
 			)
 	)

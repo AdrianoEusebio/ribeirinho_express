@@ -24,7 +24,7 @@
 [ext_resource type="PackedScene" uid="uid://sbxpmiwbixbc" path="res://scenes/house.tscn" id="20_house"]
 [ext_resource type="PackedScene" uid="uid://prop0000001" path="res://scenes/prop.tscn" id="21_prop"]
 [ext_resource type="Texture2D" uid="uid://b1p1nwgfw7k84" path="res://assets/assets/pneu.png" id="24_y6deb"]
-[ext_resource type="Texture2D" uid="uid://dq2vy0l1i37tj" path="res://assets/assets/Design sem nome.png" id="25_og1vs"]
+[ext_resource type="Texture2D" uid="uid://dq2vy0l1i37tj" path="res://assets/assets/charecter_sprites.png" id="25_og1vs"]
 [ext_resource type="Resource" uid="uid://order0000004" path="res://resources/pedidos/pedido_saude_comunitaria.tres" id="26_order"]
 [ext_resource type="Resource" uid="uid://order0000005" path="res://resources/pedidos/pedido_cesta_ribeirinha.tres" id="27_order"]
 [ext_resource type="Resource" uid="uid://order0000006" path="res://resources/pedidos/pedido_mudanca_urgente.tres" id="28_order"]
@@ -77,11 +77,11 @@ position = Vector2(1374, 679)
 [node name="Citizen3" parent="NPCs/Citizens" unique_id=852701212 instance=ExtResource("17_patrol")]
 position = Vector2(1367, 1006)
 
-[node name="Citizen4" parent="NPCs/Citizens" unique_id=1660598413 instance=ExtResource("17_patrol")]
-position = Vector2(1855, 606)
-
 [node name="Citizen5" parent="NPCs/Citizens" unique_id=842868696 instance=ExtResource("17_patrol")]
 position = Vector2(2015, 990)
+
+[node name="Ladrao2" parent="NPCs" unique_id=1233792732 instance=ExtResource("18_thief")]
+position = Vector2(2000, 648)
 
 [node name="Casa" parent="." unique_id=2101860308 instance=ExtResource("20_house")]
 position = Vector2(900.00006, -31)

@@ -15,9 +15,14 @@ var _mensagem_tween: Tween = null
 
 var _painel_pedidos: PanelContainer = null
 var _vbox_pedidos: VBoxContainer = null
+var _font_pixel: Font = null
 
 func _ready() -> void:
 	add_to_group("hud")
+	# Tenta carregar uma fonte pixelada se existir. 
+	# Caso contrário, usará a padrão do sistema.
+	_font_pixel = load("res://assets/assets/vcr_osd_mono/VCR_OSD_MONO_1.001.ttf") 
+	
 	_criar_label_countdown()
 	_criar_label_mensagem()
 	_estilizar_painel_principal()
@@ -35,29 +40,63 @@ func _process(delta: float) -> void:
 func _estilizar_painel_principal() -> void:
 	var painel: Panel = $Painel
 	painel.add_theme_stylebox_override("panel", _criar_stylebox())
+	
+	# Posicionamento dinâmico no canto superior esquerdo (Aumentado para evitar esticamento)
+	painel.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	painel.offset_left = 20
+	painel.offset_top = 20
+	painel.offset_right = 350  # Aumentado para 330 de largura
+	painel.offset_bottom = 180 # Aumentado para 160 de altura
+	
+	# Ajusta o VBox interno para respeitar as bordas da imagem
+	var vbox: VBoxContainer = $Painel/VBox
+	vbox.set_anchors_preset(Control.PRESET_FULL_RECT)
+	vbox.offset_left = 30
+	vbox.offset_top = 35
+	vbox.offset_right = -30
+	vbox.offset_bottom = -30
+	vbox.add_theme_constant_override("separation", 20) # Aumentado de 10 para dar mais espaço
 
-	label_tempo.add_theme_font_size_override("font_size", 30)
-	label_tempo.add_theme_color_override("font_color", Color.WHITE)
-	label_pontuacao.add_theme_font_size_override("font_size", 14)
-	label_pontuacao.add_theme_color_override("font_color", Color(0.8, 0.9, 1.0))
+	label_tempo.add_theme_font_size_override("font_size", 48)
+	label_tempo.add_theme_color_override("font_color", Color.WHITE) # Mudado para Branco para contraste
+	label_tempo.add_theme_stylebox_override("normal", _criar_bg_tempo())
+	label_tempo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label_tempo.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	if _font_pixel: label_tempo.add_theme_font_override("font", _font_pixel)
+	
+	label_pontuacao.add_theme_font_size_override("font_size", 20)
+	label_pontuacao.add_theme_color_override("font_color", Color(0.1, 0.1, 0.1))
+	label_pontuacao.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	if _font_pixel: label_pontuacao.add_theme_font_override("font", _font_pixel)
+	
 	label_pedidos.visible = false
 
-func _criar_stylebox() -> StyleBoxFlat:
+func _criar_bg_tempo() -> StyleBoxFlat:
 	var s := StyleBoxFlat.new()
-	s.bg_color = Color(0.04, 0.07, 0.14, 0.90)
-	s.border_width_left   = 2
-	s.border_width_right  = 2
-	s.border_width_top    = 2
-	s.border_width_bottom = 2
-	s.border_color = Color(0.35, 0.65, 1.0, 0.75)
-	s.corner_radius_top_left     = 10
-	s.corner_radius_top_right    = 10
-	s.corner_radius_bottom_left  = 10
-	s.corner_radius_bottom_right = 10
-	s.content_margin_left   = 14
-	s.content_margin_right  = 14
-	s.content_margin_top    = 12
-	s.content_margin_bottom = 12
+	s.bg_color = Color(0.1, 0.1, 0.1, 0.9) # Preto fosco
+	s.set_corner_radius_all(8) # Bordas arredondadas
+	# Padding interno para o texto não encostar nas bordas
+	s.content_margin_left = 15
+	s.content_margin_right = 15
+	s.content_margin_top = 5
+	s.content_margin_bottom = 5
+	return s
+
+func _criar_stylebox() -> StyleBoxTexture:
+	var s := StyleBoxTexture.new()
+	var tex = load("res://assets/assets/lista.png")
+	if tex:
+		s.texture = tex
+		# Configura as margens do NinePatch (Aumentado para evitar esticamento nos cantos)
+		s.texture_margin_left = 50
+		s.texture_margin_right = 50
+		s.texture_margin_top = 50
+		s.texture_margin_bottom = 50
+		# Margens de conteúdo para PanelContainers
+		s.content_margin_left = 35
+		s.content_margin_right = 35
+		s.content_margin_top = 40
+		s.content_margin_bottom = 35
 	return s
 
 # ─── Painel de pedidos (direita) ──────────────────────────────────────────────
@@ -72,22 +111,27 @@ func _criar_painel_pedidos() -> void:
 
 	var titulo := Label.new()
 	titulo.text = "Pedidos Ativos"
-	titulo.add_theme_font_size_override("font_size", 13)
-	titulo.add_theme_color_override("font_color", Color(0.55, 0.85, 1.0))
+	titulo.add_theme_font_size_override("font_size", 20) # Aumentado de 14
+	titulo.add_theme_color_override("font_color", Color.BLACK)
+	if _font_pixel: titulo.add_theme_font_override("font", _font_pixel)
 	outer.add_child(titulo)
 
 	var sep := HSeparator.new()
-	sep.add_theme_color_override("color", Color(0.35, 0.65, 1.0, 0.4))
+	sep.add_theme_color_override("color", Color(0, 0, 0, 0.2)) 
 	outer.add_child(sep)
 
 	_vbox_pedidos = VBoxContainer.new()
-	_vbox_pedidos.add_theme_constant_override("separation", 4)
+	_vbox_pedidos.add_theme_constant_override("separation", 8) # Aumentado de 4
 	outer.add_child(_vbox_pedidos)
 
 	add_child(_painel_pedidos)
 
-	var vp := get_viewport().get_visible_rect().size
-	_painel_pedidos.position = Vector2(vp.x - 235, vp.y / 2.0 - 80)
+	# Posicionamento dinâmico no canto superior direito (Aumentado significativamente)
+	_painel_pedidos.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	_painel_pedidos.offset_left = -450 # Aumentado de -350 (Largura agora aprox 430px)
+	_painel_pedidos.offset_top = 20
+	_painel_pedidos.offset_right = -20
+	# O offset_bottom será definido automaticamente pelo conteúdo no PanelContainer
 
 # ─── Atualização dos pedidos com barras de tempo ──────────────────────────────
 
@@ -114,8 +158,15 @@ func atualizar_pedidos_barcos(barcos: Array) -> void:
 		if boat != null:
 			pronto = boat.pedido_pronto
 		header.text = "%s (Barco %d)%s" % [pedido.nome, boat.spot_index + 1, " - PRONTO" if pronto else ""]
-		header.add_theme_font_size_override("font_size", 12)
-		header.add_theme_color_override("font_color", Color(0.35, 1.0, 0.45) if pronto else Color(0.65, 0.88, 1.0))
+		header.add_theme_font_size_override("font_size", 16) # Mantido tamanho maior
+		
+		# Cores: Verde se pronto, Azul se pendente (respeitando contraste)
+		if pronto:
+			header.add_theme_color_override("font_color", Color(0.0, 0.6, 0.2)) 
+		else:
+			header.add_theme_color_override("font_color", Color(0.2, 0.2, 0.2))
+			
+		if _font_pixel: header.add_theme_font_override("font", _font_pixel)
 		_vbox_pedidos.add_child(header)
 
 		_vbox_pedidos.add_child(_criar_barra_tempo(pct))
@@ -127,19 +178,39 @@ func atualizar_pedidos_barcos(barcos: Array) -> void:
 
 		for item in pedido.itens_necessarios:
 			var ok = item.nome in nomes_entregues
-			# Se o item está ok, removemos da lista de nomes_entregues para o próximo duplicado não herdar o OK por erro
 			if ok:
 				var idx = nomes_entregues.find(item.nome)
 				nomes_entregues.remove_at(idx)
 
+			var row := HBoxContainer.new()
+			row.add_theme_constant_override("separation", 10)
+			
+			# Checkbox Visual
+			var check_rect := TextureRect.new()
+			var atlas := AtlasTexture.new()
+			atlas.atlas = load("res://assets/assets/checks.png")
+			# 72x76 total -> 36x38 cada frame. 
+			# Frame 0 (concluido): 0,0. Frame 2 (padrao): 0,38
+			var frame_y = 0 if ok else 38
+			atlas.region = Rect2(0, frame_y, 36, 38)
+			check_rect.texture = atlas
+			check_rect.custom_minimum_size = Vector2(20, 20) # Redimensiona para caber na lista
+			check_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			check_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			row.add_child(check_rect)
+
 			var item_lbl := Label.new()
-			item_lbl.text = (" [OK] " if ok else "  - ") + item.nome
-			item_lbl.add_theme_font_size_override("font_size", 11)
+			item_lbl.text = item.nome
+			item_lbl.add_theme_font_size_override("font_size", 16) # Aumentado um pouco para equilibrar com o check
+			if _font_pixel: item_lbl.add_theme_font_override("font", _font_pixel)
+			
 			if ok:
-				item_lbl.add_theme_color_override("font_color", Color(0.3, 1.0, 0.5))
+				item_lbl.add_theme_color_override("font_color", Color(0.0, 0.5, 0.1))
 			else:
-				item_lbl.add_theme_color_override("font_color", Color(0.85, 0.92, 1.0))
-			_vbox_pedidos.add_child(item_lbl)
+				item_lbl.add_theme_color_override("font_color", Color(0.25, 0.25, 0.25))
+				
+			row.add_child(item_lbl)
+			_vbox_pedidos.add_child(row)
 
 		var spacer := Control.new()
 		spacer.custom_minimum_size = Vector2(0, 5)
@@ -147,7 +218,7 @@ func atualizar_pedidos_barcos(barcos: Array) -> void:
 
 func _criar_barra_tempo(pct: float) -> Control:
 	var cont := Control.new()
-	cont.custom_minimum_size = Vector2(195, 7)
+	cont.custom_minimum_size = Vector2(350, 10) # Aumentado de 250, 8
 
 	var bg := ColorRect.new()
 	bg.color = Color(0.18, 0.18, 0.18, 0.85)
@@ -178,6 +249,7 @@ func _criar_label_countdown() -> void:
 	_label_countdown.vertical_alignment   = VERTICAL_ALIGNMENT_CENTER
 	_label_countdown.add_theme_font_size_override("font_size", 96)
 	_label_countdown.add_theme_color_override("font_color", Color.WHITE)
+	if _font_pixel: _label_countdown.add_theme_font_override("font", _font_pixel)
 	_label_countdown.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.7))
 	_label_countdown.add_theme_constant_override("shadow_offset_x", 3)
 	_label_countdown.add_theme_constant_override("shadow_offset_y", 3)
@@ -201,6 +273,7 @@ func _criar_label_mensagem() -> void:
 	_label_mensagem.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.8))
 	_label_mensagem.add_theme_constant_override("shadow_offset_x", 2)
 	_label_mensagem.add_theme_constant_override("shadow_offset_y", 2)
+	if _font_pixel: _label_mensagem.add_theme_font_override("font", _font_pixel)
 	_label_mensagem.size = Vector2(620, 48)
 	_label_mensagem.visible = false
 	_label_mensagem.z_index = 180

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://item_abajur"]
+
+[ext_resource type="Script" uid="uid://c7rc5rbr3iu3m" path="res://scripts/resources/item_data.gd" id="1_mte50"]
+
+[resource]
+script = ExtResource("1_mte50")
+nome = "Abajur"
+cor = Color(1.0, 1.0, 0.6, 1)
+massa = 2.0
+tamanho = Vector2i(1, 1)
+categoria = 2
+prioridade = 2
+descricao = "Muito delicado. Não coloque nada em cima."

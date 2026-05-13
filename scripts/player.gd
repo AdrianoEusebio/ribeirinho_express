@@ -24,6 +24,7 @@ var _pocas_ativas: int = 0
 var modificador_velocidade: float = 1.0
 var _tempo_pisca_atordoado: float = 0.0
 var _pisca_atordoado_apagado: bool = false
+var esta_na_casa: bool = false # Flag de segurança (Casa)
 
 ## --- Knockback (NPC colisão) ---
 var _knockback_velocity: Vector2 = Vector2.ZERO
@@ -44,6 +45,12 @@ var _tempo_queda: float = INTERVALO_QUEDA
 func _ready() -> void:
 	add_to_group("player") # Permite que outros sistemas achem o player
 	_atualizar_visual_itens()
+	
+	# Inicia com o frame 3 da animação stumble (índice 2)
+	if animated_sprite_2d.sprite_frames.has_animation("stumble"):
+		animated_sprite_2d.animation = "stumble"
+		animated_sprite_2d.frame = 2
+		animated_sprite_2d.stop()
 
 
 func _physics_process(delta: float) -> void:
@@ -186,9 +193,8 @@ func _escorregar() -> void:
 	_mostrar_mensagem("Voce escorregou e a carga caiu!", "alerta", 2.0)
 	
 	# Animação de tropeço
-	var stumble_id = randi_range(1, 4)
-	if animated_sprite_2d.sprite_frames.has_animation("stumble_" + str(stumble_id)):
-		animated_sprite_2d.play("stumble_" + str(stumble_id))
+	if animated_sprite_2d.sprite_frames.has_animation("stumble"):
+		animated_sprite_2d.play("stumble")
 	
 	# Partículas de água
 	var splash = get_node_or_null("SplashParticles")

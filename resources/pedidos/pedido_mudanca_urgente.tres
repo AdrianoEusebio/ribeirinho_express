@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="OrderData" format=3 uid="uid://order0000006"]
 
-[ext_resource type="Script" path="res://scripts/resources/order_data.gd" id="1"]
+[ext_resource type="Script" uid="uid://cxee7bwapjcwp" path="res://scripts/resources/order_data.gd" id="1"]
+[ext_resource type="Script" uid="uid://c7rc5rbr3iu3m" path="res://scripts/resources/item_data.gd" id="1_w3rqu"]
 [ext_resource type="Resource" uid="uid://bncm2diy4fiyc" path="res://resources/itens/geladeira.tres" id="2"]
 [ext_resource type="Resource" uid="uid://bfsge5fqt078v" path="res://resources/itens/caixa_media.tres" id="3"]
 [ext_resource type="Resource" uid="uid://4p6lnsaurn46" path="res://resources/itens/medicamento.tres" id="4"]
@@ -8,6 +9,6 @@
 [resource]
 script = ExtResource("1")
 nome = "Mudanca Urgente"
-itens_necessarios = [ExtResource("2"), ExtResource("3"), ExtResource("4")]
+itens_necessarios = Array[ExtResource("1_w3rqu")]([ExtResource("2"), ExtResource("3"), ExtResource("4")])
 recompensa_pontos = 360
 tempo_limite = 60.0

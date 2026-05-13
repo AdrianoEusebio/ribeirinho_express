@@ -63,6 +63,27 @@ func _process(_delta: float) -> void:
 		_ocultar_nos_area_interior_imediato()
 	elif _estado_foco == EstadoFoco.DENTRO:
 		_mostrar_novos_nos_area_interior()
+	
+	# Repele NPCs e Ladrões da área interna
+	_repelir_npcs()
+
+func _repelir_npcs() -> void:
+	for body in area_interior.get_overlapping_bodies():
+		if body.is_in_group("player"):
+			continue
+		
+		# Se for NPC ou Ladrão, empurra para fora
+		if body is CharacterBody2D:
+			var dir_fora = (body.global_position - area_interior.global_position).normalized()
+			if dir_fora == Vector2.ZERO: dir_fora = Vector2.DOWN
+			body.velocity = dir_fora * 300.0
+			body.move_and_slide()
+			
+			# Se for ladrão e estiver perseguindo, força a desistência
+			if body.is_in_group("thief") and body.has_method("_mostrar_feedback_frustracao"):
+				if body._estado == 1: # 1 = PERSEGUINDO (conforme o enum em thief.gd)
+					body._estado = 0 # 0 = PATRULHA
+					body._mostrar_feedback_frustracao()
 
 
 func _on_area_interior_body_entered(body: Node2D) -> void:
@@ -70,6 +91,7 @@ func _on_area_interior_body_entered(body: Node2D) -> void:
 		return
 
 	_player_dentro = body
+	_player_dentro.esta_na_casa = true # Ativa zona segura
 	_estado_foco = EstadoFoco.ENTRANDO
 	body.z_index = z_foco + 3
 	casa_dentro.z_index = z_foco + 1
@@ -91,6 +113,7 @@ func _on_area_interior_body_exited(body: Node2D) -> void:
 	_estado_foco = EstadoFoco.SAINDO
 	_set_collision_enabled(paredes_fora, true)
 	_set_collision_enabled(paredes_dentro, false)
+	_player_dentro.esta_na_casa = false # Remove zona segura
 	_player_dentro = null
 	_animar_foco(false)
 

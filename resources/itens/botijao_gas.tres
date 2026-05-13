@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://item_botijao"]
+
+[ext_resource type="Script" uid="uid://c7rc5rbr3iu3m" path="res://scripts/resources/item_data.gd" id="1_mte50"]
+
+[resource]
+script = ExtResource("1_mte50")
+nome = "Botijão de Gás"
+cor = Color(0.5, 0.5, 0.6, 1)
+massa = 28.0
+tamanho = Vector2i(1, 1)
+categoria = 0
+prioridade = 4
+descricao = "Redondo e pesado. Item essencial para a vila."

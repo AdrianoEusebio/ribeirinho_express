@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://item_sofa"]
+
+[ext_resource type="Script" uid="uid://c7rc5rbr3iu3m" path="res://scripts/resources/item_data.gd" id="1_mte50"]
+
+[resource]
+script = ExtResource("1_mte50")
+nome = "Sofá"
+cor = Color(0.4, 0.25, 0.15, 1)
+massa = 45.0
+tamanho = Vector2i(3, 2)
+categoria = 0
+prioridade = 6
+descricao = "Confortável mas ocupa metade do barco."

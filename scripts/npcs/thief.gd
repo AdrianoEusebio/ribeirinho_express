@@ -54,9 +54,11 @@ func _physics_process(delta: float) -> void:
 				_estado = Estado.PERSEGUINDO
 
 		Estado.PERSEGUINDO:
-			var player_seguro: bool = player.itens_carregados.is_empty() or _player_na_doca(player)
+			var player_seguro: bool = player.itens_carregados.is_empty() or _player_na_doca(player) or player.get("esta_na_casa")
 			if player_seguro or dist > raio_deteccao * 1.4:
 				_estado = Estado.PATRULHA
+				if player.get("esta_na_casa"):
+					_mostrar_feedback_frustracao()
 			else:
 				_mover_para(player.global_position, velocidade)
 

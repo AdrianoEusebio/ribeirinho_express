@@ -6,8 +6,21 @@ extends Control
 @onready var btn_play: Button = $VBoxContainer/BtnPlay
 @onready var btn_settings: Button = $VBoxContainer/BtnSettings
 @onready var btn_quit: Button = $VBoxContainer/BtnQuit
+@onready var title_label: Label = $Title
 
 func _ready() -> void:
+	var font_title = load("res://assets/assets/04b_30/04B_30__.TTF")
+	if font_title:
+		title_label.add_theme_font_override("font", font_title)
+		title_label.add_theme_font_size_override("font_size", 64)
+	
+	var font_btns = load("res://assets/assets/vcr_osd_mono/VCR_OSD_MONO_1.001.ttf")
+	var botoes = [btn_play, btn_settings, btn_quit]
+	for btn in botoes:
+		if btn and font_btns:
+			btn.add_theme_font_override("font", font_btns)
+			btn.add_theme_font_size_override("font_size", 22) # Ajuste para legibilidade
+	
 	if btn_play:
 		btn_play.pressed.connect(_on_play_pressed)
 	if btn_settings:
