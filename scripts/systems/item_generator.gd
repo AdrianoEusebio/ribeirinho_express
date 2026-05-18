@@ -74,7 +74,7 @@ func _ready() -> void:
 	# Com escala 3x (largura 94*3=282, altura 87*3=261), ajustamos a posição
 	# para alinhar a traseira com o início da esteira e os pneus com a base.
 	_sprite_caminhao.scale = Vector2(1.7, 1.7)
-	_sprite_caminhao.position = Vector2(-55.0, -70.0)
+	_sprite_caminhao.position = Vector2(-22.0, -30.0)
 	add_child(_sprite_caminhao)
 	move_child(_sprite_caminhao, 0)
 
@@ -145,9 +145,10 @@ func _verificar_slots_liberados() -> void:
 
 	if mudou:
 		queue_redraw()
-		# Garante que o gerador retome se houver espaço e o timer estiver parado
-		if _tem_slot_livre() and _timer != null and _timer.is_stopped():
-			_timer.start()
+		
+	# Garante que o gerador retome se houver espaço e o timer estiver parado (rodando como verificação contínua e segura)
+	if _tem_slot_livre() and _timer != null and _timer.is_stopped():
+		_timer.start()
 
 
 func _tem_slot_livre() -> bool:

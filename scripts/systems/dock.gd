@@ -21,9 +21,40 @@ const DELAY_PORTO_OCUPADO := Vector2(6.0, 14.0)
 var boats: Array[Node2D]     = [null, null, null]
 var _agendados: Array[bool]  = [false, false, false]
 var _jogo_ativo: bool        = true
+var _tempo_decorrido: float  = 0.0
+
+const TODOS_ITENS_POOL := [
+	preload("res://resources/itens/caixa_media.tres"),
+	preload("res://resources/itens/caixa_pequena.tres"),
+	preload("res://resources/itens/geladeira.tres"),
+	preload("res://resources/itens/medicamento.tres"),
+	preload("res://resources/itens/saco_graos.tres"),
+	# Novos Itens - Pesados
+	preload("res://resources/itens/maquina_lavar.tres"),
+	preload("res://resources/itens/sofa.tres"),
+	preload("res://resources/itens/armario.tres"),
+	preload("res://resources/itens/botijao_gas.tres"),
+	preload("res://resources/itens/roda_caminhao.tres"),
+	# Novos Itens - Médios
+	preload("res://resources/itens/microondas.tres"),
+	preload("res://resources/itens/televisao.tres"),
+	preload("res://resources/itens/cesta_acai.tres"),
+	preload("res://resources/itens/caixa_isopor.tres"),
+	preload("res://resources/itens/caixa_suprimentos.tres"),
+	# Novos Itens - Frágeis
+	preload("res://resources/itens/abajur.tres"),
+	preload("res://resources/itens/radio_pilha.tres"),
+	preload("res://resources/itens/caixa_copos.tres"),
+	preload("res://resources/itens/vaso_planta.tres"),
+	preload("res://resources/itens/cesta_ovos.tres"),
+]
 
 func _ready() -> void:
 	add_to_group("doca")
+
+func _process(delta: float) -> void:
+	if _jogo_ativo:
+		_tempo_decorrido += delta
 
 func iniciar() -> void:
 	await get_tree().create_timer(1.0).timeout
@@ -44,6 +75,7 @@ func _agendar_spawn() -> void:
 		delay = randf_range(DELAY_PORTO_OCUPADO.x, DELAY_PORTO_OCUPADO.y)
 	else:
 		delay = randf_range(DELAY_PORTO_VAZIO.x, DELAY_PORTO_VAZIO.y)
+	delay += 5.0
 	delay *= _get_fator_dificuldade()
 	_executar_spawn_apos(slot, delay)
 
@@ -110,8 +142,24 @@ func _tem_algum_barco() -> bool:
 func _get_random_pedido(max_itens: int = 0) -> OrderData:
 	if pool_pedidos.is_empty(): return null
 	var p = pool_pedidos[randi() % pool_pedidos.size()].duplicate()
-	if max_itens > 0 and p.itens_necessarios.size() > max_itens:
-		p.itens_necessarios = p.itens_necessarios.slice(0, max_itens)
+	
+	# Progressiva a cada 1 minuto de jogo: inicia com 4 itens e aumenta +1 a cada 60 segundos
+	var num_itens := 4 + int(_tempo_decorrido / 60.0)
+	
+	# Preencher os itens da missão até atingir o num_itens usando o TODOS_ITENS_POOL (garante novos itens nas missões!)
+	while p.itens_necessarios.size() < num_itens:
+		var item_aleatorio = TODOS_ITENS_POOL[randi() % TODOS_ITENS_POOL.size()]
+		p.itens_necessarios.append(item_aleatorio)
+		
+	if p.itens_necessarios.size() > num_itens:
+		p.itens_necessarios = p.itens_necessarios.slice(0, num_itens)
+		
+	# Aumentar o tempo limite em +25 segundos
+	p.tempo_limite += 25.0
+	
+	# Definir recompensa padrão de 300 pontos por barco
+	p.recompensa_pontos = 300
+	
 	return p
 
 func _get_random_grid_config() -> GridConfig:

@@ -68,9 +68,6 @@ position = Vector2(1019, 648)
 [node name="Citizen" parent="NPCs/Citizens" unique_id=1118137891 instance=ExtResource("17_patrol")]
 position = Vector2(814, 991)
 
-[node name="Citizen2" parent="NPCs/Citizens" unique_id=1524665197 instance=ExtResource("17_patrol")]
-position = Vector2(1374, 679)
-
 [node name="Citizen3" parent="NPCs/Citizens" unique_id=852701212 instance=ExtResource("17_patrol")]
 position = Vector2(1367, 1006)
 
@@ -147,7 +144,7 @@ position = Vector2(1200, 215)
 position = Vector2(39, -140)
 
 [node name="Item" parent="Itens" unique_id=1761401518 instance=ExtResource("2_tbgi4")]
-position = Vector2(1189, 458)
+position = Vector2(1739, 434)
 dados = ExtResource("3_tefeu")
 
 [node name="Item2" parent="Itens" unique_id=1634598211 instance=ExtResource("2_tbgi4")]
