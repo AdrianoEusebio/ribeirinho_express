@@ -32,9 +32,6 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_eb6dy"]
 size = Vector2(8.75, 7.25)
 
-[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_og1vs"]
-load_path = "res://.godot/imported/Design sem nome.png-c8998ee5ad08f92c2c35d80e1d0fc760.ctex"
-
 [node name="Main" type="Node2D" unique_id=1395105730]
 script = ExtResource("9_main")
 
@@ -208,7 +205,7 @@ position = Vector2(948, 890)
 y_sort_enabled = true
 position = Vector2(-4.9999924, -17.478235)
 scale = Vector2(1.5217382, 1.5217385)
-texture = SubResource("CompressedTexture2D_og1vs")
+texture = ExtResource("25_og1vs")
 region_enabled = true
 region_rect = Rect2(722.4976, 493.84134, 67.49182, 75.81656)
 

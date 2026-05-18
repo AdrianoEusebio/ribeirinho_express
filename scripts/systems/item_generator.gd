@@ -56,11 +56,27 @@ var _acabou_de_descarregar: float = 0.0
 
 
 var _sprite_esteira: Sprite2D
+var _sprite_caminhao: Sprite2D
 var _esteira_timer: float = 0.0
 
 func _ready() -> void:
 	max_slots = max(1, max_slots)
 	_garantir_slots_prontos()
+
+	# Configurar Sprite do Caminhão
+	_sprite_caminhao = Sprite2D.new()
+	_sprite_caminhao.texture = load("res://assets/assets/truck__base_sprite__by_ogjazz_df50kmv.png")
+	_sprite_caminhao.hframes = 4
+	_sprite_caminhao.vframes = 4
+	_sprite_caminhao.frame = 5 # Index 5 (6º frame)
+	_sprite_caminhao.centered = false
+	# Alinhando a base do caminhão (pneus) com a altura da esteira e slots
+	# Com escala 3x (largura 94*3=282, altura 87*3=261), ajustamos a posição
+	# para alinhar a traseira com o início da esteira e os pneus com a base.
+	_sprite_caminhao.scale = Vector2(1.7, 1.7)
+	_sprite_caminhao.position = Vector2(-55.0, -70.0)
+	add_child(_sprite_caminhao)
+	move_child(_sprite_caminhao, 0)
 
 	# Configurar Sprite da Esteira Animada
 	_sprite_esteira = Sprite2D.new()
@@ -69,11 +85,13 @@ func _ready() -> void:
 	# 600x238 total -> 4 frames de ~59.5px altura
 	_sprite_esteira.region_rect = Rect2(0, 0, 600, 59)
 	_sprite_esteira.centered = false
-	_sprite_esteira.position = Vector2(TRUCK_W + 22.0, 10.0)
-	# Escala para a largura da doca (350 / 600)
-	_sprite_esteira.scale = Vector2(DOCK_W / 600.0, 1.0)
+	_sprite_esteira.position = Vector2(TRUCK_W + 33, 50)
+	# Escala reduzida para melhorar o visual
+	_sprite_esteira.scale = Vector2((DOCK_W / 600.0) * 0.9, 0.8)
+	_sprite_esteira.flip_h = true
 	add_child(_sprite_esteira)
-	move_child(_sprite_esteira, 0)
+	# Mantém a esteira atrás de outros elementos, mas o caminhão atrás da esteira se necessário
+	move_child(_sprite_esteira, 1)
 
 	_timer.wait_time = intervalo_remessa
 	_timer.one_shot = true
@@ -259,23 +277,8 @@ func _draw() -> void:
 
 
 func _desenhar_caminhao(font: Font) -> void:
-	var brilho := 0.08 if _acabou_de_descarregar > 0.0 else 0.0
-	var carroceria := Color(0.78 + brilho, 0.32 + brilho, 0.18 + brilho)
-	var cabine := Color(0.18, 0.56 + brilho, 0.78 + brilho)
-	var sombra := Color(0.05, 0.04, 0.035, 0.32)
-
-	draw_rect(Rect2(5.0, TRUCK_H - 1.0, TRUCK_W + 10.0, 8.0), sombra)
-	draw_rect(Rect2(0.0, 7.0, TRUCK_W - CAB_W, 31.0), carroceria)
-	draw_rect(Rect2(TRUCK_W - CAB_W, 14.0, CAB_W, 24.0), cabine)
-	draw_rect(Rect2(TRUCK_W - CAB_W + 5.0, 18.0, 14.0, 9.0), Color(0.75, 0.92, 1.0))
-	draw_rect(Rect2(0.0, 7.0, TRUCK_W - CAB_W, 31.0), Color(0.95, 0.78, 0.45), false, 1.5)
-	draw_rect(Rect2(TRUCK_W - CAB_W, 14.0, CAB_W, 24.0), Color(0.9, 0.95, 1.0), false, 1.5)
-	draw_circle(Vector2(21.0, 42.0), 8.0, Color(0.08, 0.08, 0.08))
-	draw_circle(Vector2(84.0, 42.0), 8.0, Color(0.08, 0.08, 0.08))
-	draw_circle(Vector2(21.0, 42.0), 3.3, Color(0.55, 0.55, 0.55))
-	draw_circle(Vector2(84.0, 42.0), 3.3, Color(0.55, 0.55, 0.55))
-	draw_string(font, Vector2(10.0, 28.0), "SUPRIMENTOS",
-		HORIZONTAL_ALIGNMENT_CENTER, 70, 8, Color(1.0, 0.93, 0.72))
+	# Desativado pois agora usamos o Sprite2D (_sprite_caminhao)
+	pass
 
 
 func _desenhar_area_descarga(font: Font, cheia: bool) -> void:
