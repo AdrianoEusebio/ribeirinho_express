@@ -367,22 +367,216 @@ func atualizar_pontuacao(pts: int) -> void:
 func configurar_meta_pontuacao(meta: int) -> void:
 	_meta_pontuacao = meta
 
-# ─── Resultado ────────────────────────────────────────────────────────────────
+# ─── Resultado e Persistência de Rankings ──────────────────────────────────────
+
+func _salvar_score(nome: String, pts: int) -> void:
+	var path: String = "user://scores.json"
+	var scores: Array = []
+	if FileAccess.file_exists(path):
+		var file = FileAccess.open(path, FileAccess.READ)
+		if file:
+			var content = file.get_as_text()
+			var json = JSON.new()
+			var err = json.parse(content)
+			if err == OK and json.data is Array:
+				scores = json.data
+	
+	scores.append({"name": nome.to_upper(), "score": pts, "date": Time.get_date_string_from_system()})
+	# Ordenar de forma decrescente pela pontuação
+	scores.sort_custom(func(a, b): return b["score"] < a["score"])
+	# Manter apenas o Top 10
+	if scores.size() > 10:
+		scores = scores.slice(0, 10)
+		
+	var file = FileAccess.open(path, FileAccess.WRITE)
+	if file:
+		file.store_string(JSON.stringify(scores))
 
 func mostrar_resultado(pontuacao_final: int, vitoria: bool) -> void:
-	label_tempo.text = "VITÓRIA!" if vitoria else "00:00"
 	_shake_ativo = false
 	label_tempo.position = Vector2.ZERO
-	label_tempo.add_theme_color_override("font_color", Color(0.2, 1.0, 0.4) if vitoria else Color(1.0, 0.3, 0.3))
-
-	if _vbox_pedidos:
-		for child in _vbox_pedidos.get_children():
-			child.queue_free()
-		var lbl := Label.new()
-		lbl.text = ("Entregues com sucesso!\n%d pts" if vitoria else "Tempo esgotado!\n%d pts") % pontuacao_final
-		lbl.add_theme_font_size_override("font_size", 13)
-		lbl.add_theme_color_override("font_color", Color(0.2, 1.0, 0.4) if vitoria else Color(1.0, 0.4, 0.4))
-		_vbox_pedidos.add_child(lbl)
-
-	botao_reiniciar.visible = true
-	botao_reiniciar.pressed.connect(func(): get_tree().reload_current_scene(), CONNECT_ONE_SHOT)
+	
+	# Criar overlay de tela inteira
+	var overlay = ColorRect.new()
+	overlay.name = "GameOverOverlay"
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.color = Color(0.04, 0.08, 0.14, 0.85) # Semi-transparente escuro
+	overlay.z_index = 500
+	add_child(overlay)
+	
+	# CenterContainer para alinhar
+	var center = CenterContainer.new()
+	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.add_child(center)
+	
+	# PanelContainer para o painel principal
+	var panel = PanelContainer.new()
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.08, 0.12, 0.2, 0.95)
+	style.border_width_left = 4
+	style.border_width_top = 4
+	style.border_width_right = 4
+	style.border_width_bottom = 4
+	style.border_color = Color(0.35, 0.65, 1.0)
+	style.set_corner_radius_all(12)
+	style.content_margin_left = 35
+	style.content_margin_right = 35
+	style.content_margin_top = 35
+	style.content_margin_bottom = 35
+	panel.add_theme_stylebox_override("panel", style)
+	center.add_child(panel)
+	
+	# VBoxContainer interno
+	var vbox = VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 15)
+	panel.add_child(vbox)
+	
+	# Título "GAME OVER"
+	var lbl_title = Label.new()
+	lbl_title.text = "GAME OVER"
+	lbl_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	lbl_title.add_theme_font_size_override("font_size", 48)
+	lbl_title.add_theme_color_override("font_color", Color(1.0, 0.3, 0.3))
+	if _font_pixel:
+		lbl_title.add_theme_font_override("font", _font_pixel)
+	vbox.add_child(lbl_title)
+	
+	# Pontuação Final
+	var lbl_score = Label.new()
+	lbl_score.text = "Sua Pontuacao: %d pts" % pontuacao_final
+	lbl_score.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	lbl_score.add_theme_font_size_override("font_size", 24)
+	lbl_score.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2)) # Dourado
+	if _font_pixel:
+		lbl_score.add_theme_font_override("font", _font_pixel)
+	vbox.add_child(lbl_score)
+	
+	# Separador
+	var sep1 = HSeparator.new()
+	sep1.add_theme_color_override("color", Color(1, 1, 1, 0.15))
+	vbox.add_child(sep1)
+	
+	# Seção de Iniciais (LineEdit)
+	var hbox_input = HBoxContainer.new()
+	hbox_input.alignment = HBoxContainer.ALIGNMENT_CENTER
+	hbox_input.add_theme_constant_override("separation", 10)
+	vbox.add_child(hbox_input)
+	
+	var lbl_input = Label.new()
+	lbl_input.text = "Iniciais (3 letras):"
+	lbl_input.add_theme_font_size_override("font_size", 18)
+	lbl_input.add_theme_color_override("font_color", Color.WHITE)
+	if _font_pixel:
+		lbl_input.add_theme_font_override("font", _font_pixel)
+	hbox_input.add_child(lbl_input)
+	
+	var edit_name = LineEdit.new()
+	edit_name.max_length = 3
+	edit_name.placeholder_text = "AAA"
+	edit_name.alignment = HORIZONTAL_ALIGNMENT_CENTER
+	edit_name.custom_minimum_size = Vector2(90, 40)
+	edit_name.add_theme_font_size_override("font_size", 20)
+	if _font_pixel:
+		edit_name.add_theme_font_override("font", _font_pixel)
+	
+	# Estilizar LineEdit
+	var style_edit = StyleBoxFlat.new()
+	style_edit.bg_color = Color(0.04, 0.06, 0.1, 1.0)
+	style_edit.border_width_left = 2
+	style_edit.border_width_top = 2
+	style_edit.border_width_right = 2
+	style_edit.border_width_bottom = 2
+	style_edit.border_color = Color(0.35, 0.65, 1.0)
+	style_edit.set_corner_radius_all(6)
+	edit_name.add_theme_stylebox_override("normal", style_edit)
+	edit_name.add_theme_stylebox_override("focus", style_edit)
+	
+	hbox_input.add_child(edit_name)
+	
+	# Botão Registrar Pontos
+	var btn_register = Button.new()
+	btn_register.text = "REGISTRAR PONTOS"
+	btn_register.custom_minimum_size = Vector2(250, 45)
+	btn_register.add_theme_font_size_override("font_size", 16)
+	if _font_pixel:
+		btn_register.add_theme_font_override("font", _font_pixel)
+	vbox.add_child(btn_register)
+	
+	# Estilo para os botões do Game Over
+	var style_btn = StyleBoxFlat.new()
+	style_btn.bg_color = Color(0.12, 0.22, 0.35, 1.0)
+	style_btn.set_corner_radius_all(8)
+	style_btn.content_margin_left = 15
+	style_btn.content_margin_right = 15
+	
+	var style_btn_hover = style_btn.duplicate()
+	style_btn_hover.bg_color = Color(0.18, 0.32, 0.5, 1.0)
+	
+	btn_register.add_theme_stylebox_override("normal", style_btn)
+	btn_register.add_theme_stylebox_override("hover", style_btn_hover)
+	btn_register.add_theme_stylebox_override("focus", style_btn)
+	
+	# Sucesso no Registro
+	var lbl_success = Label.new()
+	lbl_success.text = ""
+	lbl_success.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	lbl_success.add_theme_font_size_override("font_size", 14)
+	lbl_success.add_theme_color_override("font_color", Color(0.35, 1.0, 0.45))
+	if _font_pixel:
+		lbl_success.add_theme_font_override("font", _font_pixel)
+	lbl_success.visible = false
+	vbox.add_child(lbl_success)
+	
+	# Conexão do botão Registrar
+	btn_register.pressed.connect(func():
+		var iniciais = edit_name.text.strip_edges().to_upper()
+		if iniciais == "":
+			iniciais = "AAA"
+		_salvar_score(iniciais, pontuacao_final)
+		btn_register.disabled = true
+		btn_register.text = "REGISTRADO COM SUCESSO!"
+		lbl_success.text = "Score salvo para %s!" % iniciais
+		lbl_success.visible = true
+		edit_name.editable = false
+	)
+	
+	# Separador
+	var sep2 = HSeparator.new()
+	sep2.add_theme_color_override("color", Color(1, 1, 1, 0.15))
+	vbox.add_child(sep2)
+	
+	# Botão Jogar Novamente
+	var btn_retry = Button.new()
+	btn_retry.text = "JOGAR NOVAMENTE"
+	btn_retry.custom_minimum_size = Vector2(250, 45)
+	btn_retry.add_theme_font_size_override("font_size", 16)
+	if _font_pixel:
+		btn_retry.add_theme_font_override("font", _font_pixel)
+	btn_retry.add_theme_stylebox_override("normal", style_btn)
+	btn_retry.add_theme_stylebox_override("hover", style_btn_hover)
+	btn_retry.add_theme_stylebox_override("focus", style_btn)
+	vbox.add_child(btn_retry)
+	btn_retry.pressed.connect(func():
+		get_tree().reload_current_scene()
+	)
+	
+	# Botão Ir para o Menu
+	var btn_menu = Button.new()
+	btn_menu.text = "IR PARA O MENU"
+	btn_menu.custom_minimum_size = Vector2(250, 45)
+	btn_menu.add_theme_font_size_override("font_size", 16)
+	if _font_pixel:
+		btn_menu.add_theme_font_override("font", _font_pixel)
+	
+	var style_btn_menu = style_btn.duplicate()
+	style_btn_menu.bg_color = Color(0.2, 0.2, 0.2, 1.0)
+	var style_btn_menu_hover = style_btn_hover.duplicate()
+	style_btn_menu_hover.bg_color = Color(0.3, 0.3, 0.3, 1.0)
+	
+	btn_menu.add_theme_stylebox_override("normal", style_btn_menu)
+	btn_menu.add_theme_stylebox_override("hover", style_btn_menu_hover)
+	btn_menu.add_theme_stylebox_override("focus", style_btn_menu)
+	vbox.add_child(btn_menu)
+	btn_menu.pressed.connect(func():
+		get_tree().change_scene_to_file("res://scenes/ui/main_menu.tscn")
+	)

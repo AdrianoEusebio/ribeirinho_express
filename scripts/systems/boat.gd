@@ -146,7 +146,8 @@ func verificar_pedido() -> bool:
 		if not pedido_pronto:
 			pedido_pronto = true
 			_atualizar_ui_com_progresso()
-			_mostrar_mensagem("Pedido pronto no Barco %d. Aperte E para entregar." % (spot_index + 1), "sucesso", 2.4)
+			_mostrar_mensagem("Pedido pronto no Barco %d! Partindo..." % (spot_index + 1), "sucesso", 2.4)
+			confirmar_entrega()
 		return true
 	return false
 

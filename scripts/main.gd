@@ -2,7 +2,7 @@ extends Node2D
 
 enum Estado { INICIANDO, JOGANDO, ENCERRADO }
 
-@export var tempo_total: float = 180.0
+@export var tempo_total: float = 300.0
 @export var pontuacao_vitoria: int = 900
 
 # Dificuldade adaptativa
@@ -98,7 +98,11 @@ func _on_pedido_entregue(pontos_base: int, boat: Boat = null) -> void:
 	_atualizar_hud_pedidos()
 	_checar_dificuldade()
 	if pontuacao >= pontuacao_vitoria:
-		_vitoria()
+		pontuacao_vitoria += 600
+		tempo_restante += 30.0
+		hud.configurar_meta_pontuacao(pontuacao_vitoria)
+		hud.atualizar_tempo(tempo_restante)
+		hud.mostrar_mensagem("Meta batida! Nova meta: %d pts (+30s de tempo)!" % pontuacao_vitoria, "sucesso", 3.0)
 
 func _checar_dificuldade() -> void:
 	var novo_nivel := pontuacao / pontos_por_nivel_dificuldade

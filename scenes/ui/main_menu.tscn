@@ -65,6 +65,12 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "CONFIGURAÇÕES"
 
+[node name="BtnRanking" type="Button" parent="VBoxContainer"]
+custom_minimum_size = Vector2(200, 40)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "RANKING"
+
 [node name="BtnQuit" type="Button" parent="VBoxContainer"]
 custom_minimum_size = Vector2(200, 40)
 layout_mode = 2

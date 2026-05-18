@@ -113,7 +113,18 @@ func _on_boat_finished(boat) -> void:
 	_agendar_spawn()
 
 func _on_boat_timeout(boat) -> void:
-	_mostrar_mensagem("Barco %d perdeu o prazo." % (boat.spot_index + 1), "alerta", 2.0)
+	var N: int = boat.pedido.itens_necessarios.size()
+	var M: int = boat.cargo_grid.obter_itens_entregues(boat.pedido).size()
+	var pontos_parciais := 0
+	if N > 0 and M > 0:
+		pontos_parciais = max(0, int(200.0 * M / N) - 100)
+
+	if pontos_parciais > 0:
+		_mostrar_mensagem("Barco %d perdeu o prazo, mas entregou parciais: +%d pts!" % [boat.spot_index + 1, pontos_parciais], "info", 2.5)
+		pedido_entregue.emit(pontos_parciais, boat)
+	else:
+		_mostrar_mensagem("Barco %d perdeu o prazo sem entregas válidas." % (boat.spot_index + 1), "alerta", 2.0)
+
 	boats[boat.spot_index] = null
 	_agendar_spawn()
 
@@ -143,8 +154,8 @@ func _get_random_pedido(max_itens: int = 0) -> OrderData:
 	if pool_pedidos.is_empty(): return null
 	var p = pool_pedidos[randi() % pool_pedidos.size()].duplicate()
 	
-	# Progressiva a cada 1 minuto de jogo: inicia com 4 itens e aumenta +1 a cada 60 segundos
-	var num_itens := 4 + int(_tempo_decorrido / 60.0)
+	# Progressiva a cada 1 minuto de jogo: inicia com 4 itens e aumenta +1 a cada 60 segundos (limite de 10)
+	var num_itens: int = min(10, 4 + int(_tempo_decorrido / 60.0))
 	
 	# Preencher os itens da missão até atingir o num_itens usando o TODOS_ITENS_POOL (garante novos itens nas missões!)
 	while p.itens_necessarios.size() < num_itens:

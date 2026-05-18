@@ -2,8 +2,8 @@
 ## Gerencia entrada de mouse, visualização e interação com o jogador.
 extends Node2D
 
-@export var largura: int = 5
-@export var altura: int = 4
+@export var largura: int = 3
+@export var altura: int = 5
 @export var tamanho_celula: int = 40
 
 @export var distancia_interacao: float = 250.0
